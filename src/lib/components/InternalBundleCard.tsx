@@ -24,7 +24,15 @@ export const InternalBundleCard = ({ bundle }: { bundle: AsyncResult<BundleInfo>
 				</>
 			)}
 			{bundle.state === 'error' && (
-				<p className="error">Failed to compute bundle size.</p>
+				<div className="error">
+					<p>Failed to compute bundle size.</p>
+					{typeof bundle.error === 'string' && <p><code>{bundle.error}</code></p>}
+					<p>Common causes:</p>
+					<ul>
+						<li>A source file has a syntax error esbuild cannot parse — fix the file shown above</li>
+						<li><code>tsconfig.json</code> or <code>jsconfig.json</code> is malformed or unreadable</li>
+					</ul>
+				</div>
 			)}
 			{bundle.state === 'success' && (
 				<>

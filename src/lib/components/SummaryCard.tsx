@@ -18,7 +18,7 @@ export const SummaryCard = ({ bundle, smells }: Props) => {
     }
 
     if (bundle.state === 'error' || smells.state === 'error') {
-        return <p className="error">Failed to compute summary.</p>;
+        return <p className="error">Failed to compute summary — see the sections below for details.</p>;
     }
 
     const totalBytes = bundle.data.internal.total.uncompressed;

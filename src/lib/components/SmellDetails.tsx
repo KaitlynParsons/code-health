@@ -40,7 +40,15 @@ export const SmellDetails = ({ smells }: { smells: AsyncResult<Smell[]> }) => {
 	if (smells.state === 'error') {
 		return (
 			<Container>
-				<p className="error">Failed to compute smells.</p>
+				<div className="error">
+					<p>Failed to compute smells.</p>
+					{typeof smells.error === 'string' && <p><code>{smells.error}</code></p>}
+					<p>Common causes:</p>
+					<ul>
+						<li>A source file has a syntax error the TypeScript compiler cannot recover from</li>
+						<li><code>tsconfig.json</code> or <code>jsconfig.json</code> is malformed or unreadable</li>
+					</ul>
+				</div>
 			</Container>
 		);
 	}

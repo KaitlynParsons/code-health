@@ -21747,7 +21747,20 @@
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SkeletonRow, {}),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SkeletonRow, {})
       ] }),
-      bundle.state === "error" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "error", children: "Failed to compute bundle size." }),
+      bundle.state === "error" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "error", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Failed to compute bundle size." }),
+        typeof bundle.error === "string" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("code", { children: bundle.error }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Common causes:" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "A source file has a syntax error esbuild cannot parse \u2014 fix the file shown above" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("code", { children: "tsconfig.json" }),
+            " or ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("code", { children: "jsconfig.json" }),
+            " is malformed or unreadable"
+          ] })
+        ] })
+      ] }),
       bundle.state === "success" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "row", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Uncompressed" }),
@@ -21787,7 +21800,20 @@
       ] });
     }
     if (smells.state === "error") {
-      return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Container, { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "error", children: "Failed to compute smells." }) });
+      return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Container, { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "error", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "Failed to compute smells." }),
+        typeof smells.error === "string" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("code", { children: smells.error }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "Common causes:" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("ul", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("li", { children: "A source file has a syntax error the TypeScript compiler cannot recover from" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("li", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("code", { children: "tsconfig.json" }),
+            " or ",
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("code", { children: "jsconfig.json" }),
+            " is malformed or unreadable"
+          ] })
+        ] })
+      ] }) });
     }
     const smellsByType = smells.data.reduce((acc, s) => {
       (acc[s.type] ??= []).push(s);
@@ -21815,7 +21841,7 @@
       ] });
     }
     if (bundle.state === "error" || smells.state === "error") {
-      return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "error", children: "Failed to compute summary." });
+      return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "error", children: "Failed to compute summary \u2014 see the sections below for details." });
     }
     const totalBytes = bundle.data.internal.total.uncompressed;
     const smellBytes = smells.data.reduce((sum, s) => sum + s.size, 0);

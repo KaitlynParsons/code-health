@@ -23,12 +23,12 @@ export const createBundleApi = (): bundleApi => {
                 );
 
                 await Promise.all(sourceFiles.map(async (sourceFile) => {
+                    const fileName = vscode.workspace.asRelativePath(sourceFile.fileName);
                     const ext = path.extname(sourceFile.fileName).slice(1);
                     const loader = (ext === 'tsx' || ext === 'jsx') ? ext : ext === 'ts' ? 'ts' : 'js';
-                    const { code } = await esbuild.transform(sourceFile.text, { loader, minify: true });
+                    const { code } = await esbuild.transform(sourceFile.text, { loader, minify: true, sourcefile: fileName });
                     const uncompressed = Buffer.byteLength(code, 'utf8');
                     const compressed = zlib.gzipSync(code).byteLength;
-                    const fileName = vscode.workspace.asRelativePath(sourceFile.fileName);
                     total.compressed += compressed;
                     total.uncompressed += uncompressed;
                     nodes.push({ file: fileName, uncompressed, compressed });
