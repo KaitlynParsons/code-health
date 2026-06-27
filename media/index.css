@@ -148,3 +148,16 @@ summary > span:last-child {
 	font-size: 0.85em;
 	color: var(--vscode-foreground);
 }
+
+button {
+	background-color: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+	padding: var(--dimensions-100) var(--dimensions-200);
+	border: none;
+	cursor: pointer;
+	border-radius: var(--dimensions-100);
+}
+
+button:hover {
+	background-color: var(--vscode-button-hoverBackground);
+}

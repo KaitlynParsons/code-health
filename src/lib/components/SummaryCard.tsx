@@ -1,8 +1,8 @@
-import type { AsyncResult, BundleInfo, Smell } from '../../types';
+import type { AsyncResult, BundleInfo, SmellMap } from '../../types';
 
 interface Props {
     bundle: AsyncResult<BundleInfo>;
-    smells: AsyncResult<Smell[]>;
+    smells: AsyncResult<SmellMap>;
 }
 
 export const SummaryCard = ({ bundle, smells }: Props) => {
@@ -22,13 +22,13 @@ export const SummaryCard = ({ bundle, smells }: Props) => {
     }
 
     const totalBytes = bundle.data.internal.total.uncompressed;
-    const smellBytes = smells.data.reduce((sum, s) => sum + s.size, 0);
+    const smellBytes = Object.values(smells.data).flat().reduce((sum, s) => sum + s.size, 0);
     const smellPct = totalBytes > 0 ? Math.min(100, Math.round((smellBytes / totalBytes) * 100)) : 0;
     const healthPct = 100 - smellPct;
 
     const message = smellPct === 0
         ? 'Your internal code looks healthy. Keep it up!'
-        : `${smellPct}% of your internal code has a sick smell. Take action to improve maintainability.`;
+        : <><strong>{smellPct}%</strong> of your internal code has a sick smell. Take action to improve maintainability.</>;
 
     return (
         <>

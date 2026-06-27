@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { bundleApi } from './lib/services/bundleService';
-import { smellApi } from './lib/services/smellService';
+import { healthApi } from './lib/services/healthService';
 
 class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 	constructor(private readonly extensionUri: vscode.Uri) {}
@@ -30,14 +29,7 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 					data: { bundle: { state: 'loading' }, smells: { state: 'loading' } },
 				});
 
-				const smellsPromise = Promise.all([smellApi.deadCode(), smellApi.longParams()])
-					.then(([deadCode, longParams]) =>
-						deadCode.state === 'success' && longParams.state === 'success'
-							? { state: 'success' as const, data: [...deadCode.data, ...longParams.data] }
-							: deadCode.state === 'error' ? deadCode : longParams
-					);
-
-				const [bundle, smells] = await Promise.all([bundleApi.internalSize(), smellsPromise]);
+				const [bundle, smells] = await Promise.all([healthApi.internalSize(), healthApi.codeSmells()]);
 
 				webviewView.webview.postMessage({
 					type: 'results',

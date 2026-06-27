@@ -1,16 +1,20 @@
-import * as path from 'path';
-import * as zlib from 'zlib';
 import * as vscode from 'vscode';
 import * as esbuild from 'esbuild';
-import { AsyncResult, BundleInfo, BundleSize, ModuleNode } from "../../types";
+import * as zlib from 'zlib';
+import { AsyncResult, BundleInfo, BundleSize, ModuleNode, SmellMap } from "../../types";
+import { findUnusedExports } from "../utils/findUnusedExports";
+import { findUnusedImports } from "../utils/findUnusedImports";
+import { findLongParamFunctions } from "../utils/findLongParamFunctions";
 import { createProgramForRoot } from "../utils/createProgram";
 import { tryAsync } from "../utils/asyncResult";
+import path from 'path';
 
-export interface bundleApi {
+export interface HealthApi {
   readonly internalSize: () => Promise<AsyncResult<BundleInfo>>;
+  readonly codeSmells: () => Promise<AsyncResult<SmellMap>>;
 }
 
-export const createBundleApi = (): bundleApi => {
+export const createHealthApi = (): HealthApi => {
     return {
         internalSize: () => tryAsync(async () => {
             const nodes: ModuleNode[] = [];
@@ -36,8 +40,25 @@ export const createBundleApi = (): bundleApi => {
             }
 
             return { internal: { nodes, total } };
-        })
+        }),
+        codeSmells: () => tryAsync(() => {
+          const codeSmells: SmellMap = {};
+          for (const folder of vscode.workspace.workspaceFolders ?? []) {
+              const program = createProgramForRoot(folder.uri.fsPath);
+              const sourceFiles = program.getSourceFiles().filter(
+                  f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f)
+              );
+
+              const unusedImports = findUnusedImports(program);
+              const unusedExports = findUnusedExports(program, sourceFiles);
+              const longParams = findLongParamFunctions(program, sourceFiles);
+
+              codeSmells["dead"] = [...unusedExports, ...unusedImports];
+              codeSmells["longParams"] = longParams;
+            }
+            return Promise.resolve(codeSmells);
+        }),
     };
 };
 
-export const bundleApi = createBundleApi();
+export const healthApi = createHealthApi();

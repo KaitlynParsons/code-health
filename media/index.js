@@ -21815,11 +21815,7 @@
         ] })
       ] }) });
     }
-    const smellsByType = smells.data.reduce((acc, s) => {
-      (acc[s.type] ??= []).push(s);
-      return acc;
-    }, {});
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Container, { children: Object.entries(smellsByType).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("details", { children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Container, { children: Object.entries(smells.data).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("details", { children: [
       /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: formatType(type) }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: items.length })
@@ -21844,10 +21840,16 @@
       return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "error", children: "Failed to compute summary \u2014 see the sections below for details." });
     }
     const totalBytes = bundle.data.internal.total.uncompressed;
-    const smellBytes = smells.data.reduce((sum, s) => sum + s.size, 0);
+    const smellBytes = Object.values(smells.data).flat().reduce((sum, s) => sum + s.size, 0);
     const smellPct = totalBytes > 0 ? Math.min(100, Math.round(smellBytes / totalBytes * 100)) : 0;
     const healthPct = 100 - smellPct;
-    const message = smellPct === 0 ? "Your internal code looks healthy. Keep it up!" : `${smellPct}% of your internal code has a sick smell. Take action to improve maintainability.`;
+    const message = smellPct === 0 ? "Your internal code looks healthy. Keep it up!" : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("strong", { children: [
+        smellPct,
+        "%"
+      ] }),
+      " of your internal code has a sick smell. Take action to improve maintainability."
+    ] });
     return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "health-bar", children: [
         healthPct > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "health-bar__fill health-bar__fill--healthy", style: { width: `${healthPct}%` } }),

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import type { AsyncResult, Smell } from '../../types';
+import type { AsyncResult, Smell, SmellMap } from '../../types';
 
 const smellTypeLabel: Record<string, string> = {
 	dead: 'Dead Code',
@@ -27,7 +27,7 @@ const Container = ({ children }: { children: ReactNode }) => {
 	);
 }
 
-export const SmellDetails = ({ smells }: { smells: AsyncResult<Smell[]> }) => {
+export const SmellDetails = ({ smells }: { smells: AsyncResult<SmellMap> }) => {
 	if (smells.state === 'loading') {
 		return (
 			<Container>
@@ -53,14 +53,9 @@ export const SmellDetails = ({ smells }: { smells: AsyncResult<Smell[]> }) => {
 		);
 	}
 
-	const smellsByType = smells.data.reduce<Record<string, Smell[]>>((acc, s) => {
-		(acc[s.type] ??= []).push(s);
-		return acc;
-	}, {});
-
 	return (
 		<Container>
-			{Object.entries(smellsByType).map(([type, items]) => (
+			{Object.entries(smells.data).map(([type, items]) => (
 				<details key={type}>
 					<summary>
 						<span>{formatType(type)}</span>

@@ -1,10 +1,10 @@
 type SmellType = "dead" | "duplicate" | "longParams";
+type File = string;
 
 export type AsyncResult<T> =
     | { state: "loading" }
     | { state: "error"; error: unknown }
     | { state: "success"; data: T };
-type File = string;
 
 export interface Smell {
 	file: File;
@@ -14,6 +14,7 @@ export interface Smell {
 	size: number;
 	type: SmellType;
 }
+export type SmellMap = Record<string, Smell[]>;
 
 export interface BundleSize {
 	/** Byte size of the minified JS output via esbuild */

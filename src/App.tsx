@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import type { AsyncResult, BundleInfo, Smell } from './types';
+import type { AsyncResult, BundleInfo, Smell, SmellMap } from './types';
 import { InternalBundleCard } from './lib/components/InternalBundleCard';
 import { SmellDetails } from './lib/components/SmellDetails';
 import { SummaryCard } from './lib/components/SummaryCard';
 
 interface Results {
 	bundle: AsyncResult<BundleInfo>;
-	smells: AsyncResult<Smell[]>;
+	smells: AsyncResult<SmellMap>;
 }
 
 const LOADING = { state: "loading" } as const;
