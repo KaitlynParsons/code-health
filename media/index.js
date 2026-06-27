@@ -21854,7 +21854,7 @@
         smellPct,
         "%"
       ] }),
-      " of your internal code has a sick smell. Take action to improve maintainability."
+      " of your internal code smells unwell. Take action to improve maintainability."
     ] });
     return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "health-bar", children: [

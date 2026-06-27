@@ -28,7 +28,7 @@ export const SummaryCard = ({ bundle, smells }: Props) => {
 
     const message = smellPct === 0
         ? 'Your internal code looks healthy. Keep it up!'
-        : <><strong>{smellPct}%</strong> of your internal code has a sick smell. Take action to improve maintainability.</>;
+        : <><strong>{smellPct}%</strong> of your internal code smells unwell. Take action to improve maintainability.</>;
 
     return (
         <>
