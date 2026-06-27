@@ -23,7 +23,9 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 			.replace('{{stylesheet}}', stylesheetUri.toString());
 
 		webviewView.webview.onDidReceiveMessage(async message => {
-			if (message.type === 'ready') {
+			if (message.type === 'openExternal') {
+				vscode.env.openExternal(vscode.Uri.parse(message.url));
+			} else if (message.type === 'ready') {
 				webviewView.webview.postMessage({
 					type: 'results',
 					data: { bundle: { state: 'loading' }, smells: { state: 'loading' } },
