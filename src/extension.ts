@@ -14,7 +14,7 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 			localResourceRoots: [mediaUri],
 		};
 
-		const scriptUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'webview.js'));
+		const scriptUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'index.js'));
 		const iconUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'icon.svg'));
 		const stylesheetUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'index.css'));
 		const htmlPath = path.join(this.extensionUri.fsPath, 'media', 'index.html');
@@ -30,10 +30,14 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 					data: { bundle: { state: 'loading' }, smells: { state: 'loading' } },
 				});
 
-				const [bundle, smells] = await Promise.all([
-					bundleApi.internalSize(),
-					smellApi.deadCode(),
-				]);
+				const smellsPromise = Promise.all([smellApi.deadCode(), smellApi.longParams()])
+					.then(([deadCode, longParams]) =>
+						deadCode.state === 'success' && longParams.state === 'success'
+							? { state: 'success' as const, data: [...deadCode.data, ...longParams.data] }
+							: deadCode.state === 'error' ? deadCode : longParams
+					);
+
+				const [bundle, smells] = await Promise.all([bundleApi.internalSize(), smellsPromise]);
 
 				webviewView.webview.postMessage({
 					type: 'results',

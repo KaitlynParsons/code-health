@@ -1,6 +1,6 @@
-# dead-code README
+# code-health README
 
-This is the README for your extension "dead-code". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "code-health". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 

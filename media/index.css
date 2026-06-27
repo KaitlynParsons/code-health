@@ -61,6 +61,10 @@ details {
 	padding: var(--dimensions-200) var(--dimensions-300);
 }
 
+details + details {
+	margin-top: var(--dimensions-100);
+}
+
 summary {
 	cursor: pointer;
 }

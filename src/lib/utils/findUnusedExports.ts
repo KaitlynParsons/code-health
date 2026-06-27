@@ -64,7 +64,7 @@ export const findUnusedExports = (program: ts.Program, sourceFiles: ts.SourceFil
 				file: vscode.workspace.asRelativePath(declFile.fileName),
 				startLine: startLine + 1,
 				endLine: endLine + 1,
-				message: `'${exportSymbol.name}' is exported but never imported`,
+				message: `'${exportSymbol.name}' is exported but never imported.`,
 				size: Buffer.byteLength(text, 'utf8'),
 				type: "dead"
 			});

@@ -21723,10 +21723,10 @@
     }
   });
 
-  // src/webview/index.tsx
+  // src/index.tsx
   var import_client = __toESM(require_client());
 
-  // src/webview/App.tsx
+  // src/App.tsx
   var import_react = __toESM(require_react());
 
   // src/lib/components/InternalBundleCard.tsx
@@ -21857,7 +21857,7 @@
     ] });
   };
 
-  // src/webview/App.tsx
+  // src/App.tsx
   var import_jsx_runtime4 = __toESM(require_jsx_runtime());
   var LOADING = { state: "loading" };
   var App = ({ postMessage }) => {
@@ -21887,7 +21887,7 @@
     ] });
   };
 
-  // src/webview/index.tsx
+  // src/index.tsx
   var import_jsx_runtime5 = __toESM(require_jsx_runtime());
   var vscode = acquireVsCodeApi();
   var root = (0, import_client.createRoot)(document.getElementById("root"));
@@ -21950,4 +21950,4 @@ react/cjs/react-jsx-runtime.development.js:
    * LICENSE file in the root directory of this source tree.
    *)
 */
-//# sourceMappingURL=webview.js.map
+//# sourceMappingURL=index.js.map
