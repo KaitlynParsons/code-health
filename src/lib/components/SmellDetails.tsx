@@ -1,4 +1,5 @@
-import type { Smell } from '../../types';
+import { ReactNode } from 'react';
+import type { AsyncResult, Smell } from '../../types';
 
 const smellTypeLabel: Record<string, string> = {
 	dead: 'Dead Code',
@@ -8,22 +9,63 @@ const smellTypeLabel: Record<string, string> = {
 
 const formatType = (type: string) => smellTypeLabel[type] ?? type;
 
-interface SmellDetailsProps {
-	type: string;
-	items: Smell[];
-}
-
-export const SmellDetails = ({ type, items }: SmellDetailsProps) => (
-	<details>
-		<summary key={type}>
-			<span>{formatType(type)}</span>
-			<span>{items.length}</span>
+const SkeletonGroup = () => (
+	<details open={false}>
+		<summary>
+			<span className="skeleton skeleton--text" style={{ width: '30%' }} />
+			<span className="skeleton skeleton--text skeleton--short" />
 		</summary>
-		{items.map(({ file, startLine, endLine, message }) => (
-			<div className="row">
-				<span>{`${file}:${startLine}:${endLine}`}</span>
-				<span>{message}</span>
-			</div>
-		))}
 	</details>
 );
+
+const Container = ({ children }: { children: ReactNode }) => {
+	return (
+		<div className="section">
+			<h2>Smells</h2>
+			{children}
+		</div>
+	);
+}
+
+export const SmellDetails = ({ smells }: { smells: AsyncResult<Smell[]> }) => {
+	if (smells.state === 'loading') {
+		return (
+			<Container>
+				<SkeletonGroup />
+				<SkeletonGroup />
+			</Container>
+		);
+	}
+
+	if (smells.state === 'error') {
+		return (
+			<Container>
+				<p className="error">Failed to compute smells.</p>
+			</Container>
+		);
+	}
+
+	const smellsByType = smells.data.reduce<Record<string, Smell[]>>((acc, s) => {
+		(acc[s.type] ??= []).push(s);
+		return acc;
+	}, {});
+
+	return (
+		<Container>
+			{Object.entries(smellsByType).map(([type, items]) => (
+				<details key={type}>
+					<summary>
+						<span>{formatType(type)}</span>
+						<span>{items.length}</span>
+					</summary>
+					{items.map(({ file, startLine, endLine, message }) => (
+						<div className="row" key={`${file}:${startLine}`}>
+							<span>{`${file}:${startLine}:${endLine}`}</span>
+							<span>{message}</span>
+						</div>
+					))}
+				</details>
+			))}
+		</Container>
+	);
+};

@@ -21736,17 +21736,27 @@
     if (bytes >= 1024) return `${(bytes / 1024).toFixed(2)} KB`;
     return `${bytes} B`;
   };
+  var SkeletonRow = () => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "row", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "skeleton skeleton--text" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "skeleton skeleton--text skeleton--short" })
+  ] });
   var InternalBundleCard = ({ bundle }) => {
-    const { uncompressed, compressed } = bundle.internal.total;
     return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "section", children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { children: "Internal Bundle Size" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "row", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Uncompressed" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: formatSize(uncompressed) })
+      bundle.state === "loading" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SkeletonRow, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SkeletonRow, {})
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "row", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Compressed" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: formatSize(compressed) })
+      bundle.state === "error" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "error", children: "Failed to compute bundle size." }),
+      bundle.state === "success" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Uncompressed" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: formatSize(bundle.data.internal.total.uncompressed) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Compressed" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: formatSize(bundle.data.internal.total.compressed) })
+        ] })
       ] })
     ] });
   };
@@ -21759,19 +21769,71 @@
     longParams: "Long Parameter List"
   };
   var formatType = (type) => smellTypeLabel[type] ?? type;
-  var SmellDetails = ({ type, items }) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("details", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: formatType(type) }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: items.length })
-    ] }, type),
-    items.map(({ file, startLine, endLine, message }) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "row", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: `${file}:${startLine}:${endLine}` }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: message })
-    ] }))
-  ] });
+  var SkeletonGroup = () => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("details", { open: false, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "skeleton skeleton--text", style: { width: "30%" } }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "skeleton skeleton--text skeleton--short" })
+  ] }) });
+  var Container = ({ children }) => {
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "section", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { children: "Smells" }),
+      children
+    ] });
+  };
+  var SmellDetails = ({ smells }) => {
+    if (smells.state === "loading") {
+      return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Container, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SkeletonGroup, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SkeletonGroup, {})
+      ] });
+    }
+    if (smells.state === "error") {
+      return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Container, { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "error", children: "Failed to compute smells." }) });
+    }
+    const smellsByType = smells.data.reduce((acc, s) => {
+      (acc[s.type] ??= []).push(s);
+      return acc;
+    }, {});
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Container, { children: Object.entries(smellsByType).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("details", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: formatType(type) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: items.length })
+      ] }),
+      items.map(({ file, startLine, endLine, message }) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "row", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: `${file}:${startLine}:${endLine}` }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: message })
+      ] }, `${file}:${startLine}`))
+    ] }, type)) });
+  };
+
+  // src/lib/components/SummaryCard.tsx
+  var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+  var SummaryCard = ({ bundle, smells }) => {
+    if (bundle.state === "loading" || smells.state === "loading") {
+      return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "health-bar", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "health-bar__fill skeleton", style: { width: "100%" } }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "skeleton skeleton--text", style: { width: "70%", marginTop: "8px", display: "block" } })
+      ] });
+    }
+    if (bundle.state === "error" || smells.state === "error") {
+      return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "error", children: "Failed to compute summary." });
+    }
+    const totalBytes = bundle.data.internal.total.uncompressed;
+    const smellBytes = smells.data.reduce((sum, s) => sum + s.size, 0);
+    const smellPct = totalBytes > 0 ? Math.min(100, Math.round(smellBytes / totalBytes * 100)) : 0;
+    const healthPct = 100 - smellPct;
+    const message = smellPct === 0 ? "Your internal code looks healthy. Keep it up!" : `${smellPct}% of your internal code has a sick smell. Take action to improve maintainability.`;
+    return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "health-bar", children: [
+        healthPct > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "health-bar__fill health-bar__fill--healthy", style: { width: `${healthPct}%` } }),
+        smellPct > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "health-bar__fill health-bar__fill--smelly", style: { width: `${smellPct}%` } })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "health-bar__label", children: message })
+    ] });
+  };
 
   // src/webview/App.tsx
-  var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+  var import_jsx_runtime4 = __toESM(require_jsx_runtime());
+  var LOADING = { state: "loading" };
   var App = ({ postMessage }) => {
     const [results, setResults] = (0, import_react.useState)(null);
     (0, import_react.useEffect)(() => {
@@ -21785,28 +21847,25 @@
       postMessage({ type: "ready" });
       return () => window.removeEventListener("message", handler);
     }, []);
-    if (results === null) {
-      return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "Scanning..." });
-    }
-    const smellsByType = results.smells.reduce((acc, s) => {
-      (acc[s.type] ??= []).push(s);
-      return acc;
-    }, {});
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => postMessage({ type: "ready" }), "aria-label": "Refresh", children: "Refresh" }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(InternalBundleCard, { bundle: results.bundle }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "section", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { children: "Smells" }),
-        Object.entries(smellsByType).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SmellDetails, { type, items }, type))
-      ] })
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "row", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h1", { children: "Report" }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => postMessage({ type: "ready" }), "aria-label": "Refresh", children: "Refresh" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { children: "Summary" }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(SummaryCard, { bundle: results?.bundle || LOADING, smells: results?.smells || LOADING })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(SmellDetails, { smells: results?.smells || LOADING }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InternalBundleCard, { bundle: results?.bundle || LOADING })
     ] });
   };
 
   // src/webview/index.tsx
-  var import_jsx_runtime4 = __toESM(require_jsx_runtime());
+  var import_jsx_runtime5 = __toESM(require_jsx_runtime());
   var vscode = acquireVsCodeApi();
   var root = (0, import_client.createRoot)(document.getElementById("root"));
-  root.render(/* @__PURE__ */ (0, import_jsx_runtime4.jsx)(App, { postMessage: (msg) => vscode.postMessage(msg) }));
+  root.render(/* @__PURE__ */ (0, import_jsx_runtime5.jsx)(App, { postMessage: (msg) => vscode.postMessage(msg) }));
 })();
 /*! Bundled license information:
 

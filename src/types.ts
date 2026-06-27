@@ -1,4 +1,9 @@
 type SmellType = "dead" | "duplicate" | "longParams";
+
+export type AsyncResult<T> =
+    | { state: "loading" }
+    | { state: "error"; error: unknown }
+    | { state: "success"; data: T };
 type File = string;
 
 export interface Smell {

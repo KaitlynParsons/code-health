@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import type { BundleInfo, Smell } from '../types';
+import type { AsyncResult, BundleInfo, Smell } from '../types';
 import { InternalBundleCard } from '../lib/components/InternalBundleCard';
 import { SmellDetails } from '../lib/components/SmellDetails';
+import { SummaryCard } from '../lib/components/SummaryCard';
 
 interface Results {
-	bundle: BundleInfo;
-	smells: Smell[];
+	bundle: AsyncResult<BundleInfo>;
+	smells: AsyncResult<Smell[]>;
 }
+
+const LOADING = { state: "loading" } as const;
 
 export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) => {
 	const [results, setResults] = useState<Results | null>(null);
@@ -23,27 +26,20 @@ export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) =>
 		return () => window.removeEventListener('message', handler);
 	}, []);
 
-	if (results === null) {
-		return <p>Scanning...</p>;
-	}
-
-	const smellsByType = results.smells.reduce<Record<string, Smell[]>>((acc, s) => {
-		(acc[s.type] ??= []).push(s);
-		return acc;
-	}, {});
-
 	return (
 		<>
-			<button onClick={() => postMessage({ type: 'ready' })} aria-label="Refresh">
-				Refresh
-			</button>
-			<InternalBundleCard bundle={results.bundle} />
-			<div className="section">
-				<h2>Smells</h2>
-				{Object.entries(smellsByType).map(([type, items]) => (
-					<SmellDetails key={type} type={type} items={items} />
-				))}
+			<div className='row'>
+				<h1>Report</h1>
+				<button onClick={() => postMessage({ type: 'ready' })} aria-label="Refresh">
+					Refresh
+				</button>
 			</div>
+			<div className='section'>
+				<h2>Summary</h2>
+				<SummaryCard bundle={results?.bundle || LOADING} smells={results?.smells || LOADING} />
+			</div>
+			<SmellDetails smells={results?.smells || LOADING} />
+			<InternalBundleCard bundle={results?.bundle || LOADING} />
 		</>
 	);
 };

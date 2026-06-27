@@ -27,14 +27,17 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 			if (message.type === 'ready') {
 				webviewView.webview.postMessage({
 					type: 'results',
-					data: {
-						bundle: {
-							internal: (await bundleApi.internalSize()).internal,
-						},
-						smells: [
-							...smellApi.deadCode()
-						],
-					},
+					data: { bundle: { state: 'loading' }, smells: { state: 'loading' } },
+				});
+
+				const [bundle, smells] = await Promise.all([
+					bundleApi.internalSize(),
+					smellApi.deadCode(),
+				]);
+
+				webviewView.webview.postMessage({
+					type: 'results',
+					data: { bundle, smells },
 				});
 			}
 		});

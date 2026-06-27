@@ -2,25 +2,26 @@ import * as path from 'path';
 import * as zlib from 'zlib';
 import * as vscode from 'vscode';
 import * as esbuild from 'esbuild';
-import { BundleInfo, BundleSize, ModuleNode } from "../../types";
+import { AsyncResult, BundleInfo, BundleSize, ModuleNode } from "../../types";
 import { createProgramForRoot } from "../utils/createProgram";
+import { tryAsync } from "../utils/asyncResult";
 
 export interface bundleApi {
-  readonly internalSize: () => Promise<BundleInfo>;
+  readonly internalSize: () => Promise<AsyncResult<BundleInfo>>;
 }
 
 export const createBundleApi = (): bundleApi => {
     return {
-        internalSize: async () => {
+        internalSize: () => tryAsync(async () => {
             const nodes: ModuleNode[] = [];
             const total: BundleSize = { uncompressed: 0, compressed: 0 };
-        
+
             for (const folder of vscode.workspace.workspaceFolders ?? []) {
                 const program = createProgramForRoot(folder.uri.fsPath);
                 const sourceFiles = program.getSourceFiles().filter(
                     f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f)
                 );
-        
+
                 await Promise.all(sourceFiles.map(async (sourceFile) => {
                     const ext = path.extname(sourceFile.fileName).slice(1);
                     const loader = (ext === 'tsx' || ext === 'jsx') ? ext : ext === 'ts' ? 'ts' : 'js';
@@ -33,9 +34,9 @@ export const createBundleApi = (): bundleApi => {
                     nodes.push({ file: fileName, uncompressed, compressed });
                 }));
             }
-        
+
             return { internal: { nodes, total } };
-        }
+        })
     };
 };
 

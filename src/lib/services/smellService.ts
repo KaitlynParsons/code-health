@@ -1,16 +1,17 @@
 import * as vscode from 'vscode';
-import { Smell } from "../../types";
+import { AsyncResult, Smell } from "../../types";
 import { findUnusedExports } from "../utils/findUnusedExports";
 import { findUnusedImports } from "../utils/findUnusedImports";
 import { createProgramForRoot } from "../utils/createProgram";
+import { tryAsync } from "../utils/asyncResult";
 
 export interface SmellApi {
-  readonly deadCode: () => Smell[];
+  readonly deadCode: () => Promise<AsyncResult<Smell[]>>;
 }
 
 export const createSmellApi = (): SmellApi => {
     return {
-        deadCode: () => {
+        deadCode: () => tryAsync(() => {
           const deadCode: Smell[] = [];
           for (const folder of vscode.workspace.workspaceFolders ?? []) {
               const program = createProgramForRoot(folder.uri.fsPath);
@@ -22,8 +23,8 @@ export const createSmellApi = (): SmellApi => {
               const unusedExports = findUnusedExports(program, sourceFiles);
               deadCode.push(...unusedExports, ...unusedImports);
             }
-            return deadCode;
-        }
+            return Promise.resolve(deadCode);
+        })
     };
 };
 

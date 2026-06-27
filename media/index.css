@@ -84,6 +84,63 @@ summary > span:last-child {
 .row {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 	padding: 2px 0;
 	font-size: 0.9em;
+}
+
+@keyframes skeleton-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.4; }
+}
+
+.skeleton {
+	display: inline-block;
+	background-color: var(--vscode-foreground);
+	border-radius: var(--dimensions-100);
+	opacity: 0.15;
+	animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton--text {
+	height: 0.85em;
+	width: 60%;
+	vertical-align: middle;
+}
+
+.skeleton--short {
+	width: 20%;
+}
+
+.error {
+	color: var(--vscode-errorForeground);
+	font-size: 0.9em;
+	margin: 0;
+}
+
+.health-bar {
+	display: flex;
+	height: 20px;
+	border-radius: var(--dimensions-100);
+	overflow: hidden;
+	gap: 2px;
+}
+
+.health-bar__fill {
+	height: 100%;
+	transition: width 0.4s ease;
+}
+
+.health-bar__fill--healthy {
+	background-color: #4caf50;
+}
+
+.health-bar__fill--smelly {
+	background-color: #f0b429;
+}
+
+.health-bar__label {
+	margin: 6px 0 0 0;
+	font-size: 0.85em;
+	color: var(--vscode-descriptionForeground);
 }
