@@ -21779,7 +21779,8 @@
   var smellTypeLabel = {
     dead: "Dead Code",
     duplicate: "Duplicate Code",
-    longParams: "Long Parameter List"
+    longParams: "Long Parameter List",
+    barrel: "Barrel Files"
   };
   var formatType = (type) => smellTypeLabel[type] ?? type;
   var SkeletonGroup = () => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("details", { open: false, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
@@ -21795,6 +21796,8 @@
   var SmellDetails = ({ smells }) => {
     if (smells.state === "loading") {
       return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Container, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SkeletonGroup, {}),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SkeletonGroup, {}),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SkeletonGroup, {}),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SkeletonGroup, {})
       ] });
@@ -21815,16 +21818,19 @@
         ] })
       ] }) });
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Container, { children: Object.entries(smells.data).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("details", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: formatType(type) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: items.length })
-      ] }),
-      items.map(({ file, startLine, endLine, message }) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "row", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: `${file}:${startLine}:${endLine}` }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: message })
-      ] }, `${file}:${startLine}`))
-    ] }, type)) });
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Container, { children: [
+      Object.entries(smells.data).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("details", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: formatType(type) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: items.length })
+        ] }),
+        items.map(({ file, startLine, endLine, message }) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: `${file}:${startLine}:${endLine}` }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: message })
+        ] }, `${file}:${startLine}`))
+      ] }, type)),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "note", children: "Some results may be false positives. Use your judgment before acting on them." })
+    ] });
   };
 
   // src/lib/components/SummaryCard.tsx

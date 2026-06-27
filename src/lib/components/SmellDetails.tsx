@@ -5,6 +5,7 @@ const smellTypeLabel: Record<string, string> = {
 	dead: 'Dead Code',
 	duplicate: 'Duplicate Code',
 	longParams: 'Long Parameter List',
+	barrel: 'Barrel Files',
 };
 
 const formatType = (type: string) => smellTypeLabel[type] ?? type;
@@ -31,6 +32,8 @@ export const SmellDetails = ({ smells }: { smells: AsyncResult<SmellMap> }) => {
 	if (smells.state === 'loading') {
 		return (
 			<Container>
+				<SkeletonGroup />
+				<SkeletonGroup />
 				<SkeletonGroup />
 				<SkeletonGroup />
 			</Container>
@@ -69,6 +72,7 @@ export const SmellDetails = ({ smells }: { smells: AsyncResult<SmellMap> }) => {
 					))}
 				</details>
 			))}
+			<p className="note">Some results may be false positives. Use your judgment before acting on them.</p>
 		</Container>
 	);
 };

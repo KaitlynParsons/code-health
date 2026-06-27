@@ -122,6 +122,12 @@ summary > span:last-child {
 	margin: 0;
 }
 
+.note {
+	color: var(--vscode-foreground);
+	font-size: 0.8em;
+	margin: 8px 0 0 0;
+}
+
 .health-bar {
 	display: flex;
 	height: 20px;

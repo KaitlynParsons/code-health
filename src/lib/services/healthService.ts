@@ -5,6 +5,8 @@ import { AsyncResult, BundleInfo, BundleSize, ModuleNode, SmellMap } from "../..
 import { findUnusedExports } from "../utils/findUnusedExports";
 import { findUnusedImports } from "../utils/findUnusedImports";
 import { findLongParamFunctions } from "../utils/findLongParamFunctions";
+import { findDuplicateCode } from "../utils/findDuplicateCode";
+import { findBarrelFiles } from "../utils/findBarrelFiles";
 import { createProgramForRoot } from "../utils/createProgram";
 import { tryAsync } from "../utils/asyncResult";
 import path from 'path';
@@ -41,7 +43,7 @@ export const createHealthApi = (): HealthApi => {
 
             return { internal: { nodes, total } };
         }),
-        codeSmells: () => tryAsync(() => {
+        codeSmells: () => tryAsync(async () => {
           const codeSmells: SmellMap = {};
           for (const folder of vscode.workspace.workspaceFolders ?? []) {
               const program = createProgramForRoot(folder.uri.fsPath);
@@ -52,11 +54,15 @@ export const createHealthApi = (): HealthApi => {
               const unusedImports = findUnusedImports(program);
               const unusedExports = findUnusedExports(program, sourceFiles);
               const longParams = findLongParamFunctions(program, sourceFiles);
+              const duplicates = await findDuplicateCode(folder.uri.fsPath);
+              const barrels = findBarrelFiles(sourceFiles);
 
               codeSmells["dead"] = [...unusedExports, ...unusedImports];
+              codeSmells["duplicate"] = duplicates;
               codeSmells["longParams"] = longParams;
+              codeSmells["barrel"] = barrels;
             }
-            return Promise.resolve(codeSmells);
+            return codeSmells;
         }),
     };
 };

@@ -1,4 +1,4 @@
-type SmellType = "dead" | "duplicate" | "longParams";
+type SmellType = "dead" | "duplicate" | "longParams" | "barrel";
 type File = string;
 
 export type AsyncResult<T> =
