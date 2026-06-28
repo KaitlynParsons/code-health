@@ -27,8 +27,9 @@
       "code-health-sidebar": [
         {
           "type": "webview",
-          "id": "code-health.view",
-          "name": "Code Health"
+          "id": "code-health-sidebar",
+          "name": "Code Health",
+          "icon": "media/icon.svg"
         }
       ]
     },

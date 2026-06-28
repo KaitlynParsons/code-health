@@ -30,14 +30,9 @@ export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) =>
 		<>
 			<div className='row'>
 				<h1>Report</h1>
-				<div style={{ display: 'flex', gap: 'var(--dimensions-100)' }}>
-					<button onClick={() => postMessage({ type: 'openExternal', url: 'https://marketplace.visualstudio.com/items?itemName=kaitlynparsons.code-health&ssr=false#review-details' })} aria-label="Feedback">
-						Feedback
-					</button>
-					<button onClick={() => postMessage({ type: 'ready' })} aria-label="Refresh">
-						Refresh
-					</button>
-				</div>
+				<button onClick={() => postMessage({ type: 'ready' })} aria-label="Refresh">
+					Refresh
+				</button>
 			</div>
 			<div className='section'>
 				<h2>Summary</h2>

@@ -21884,10 +21884,7 @@
     return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "row", children: [
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h1", { children: "Report" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", gap: "var(--dimensions-100)" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => postMessage({ type: "openExternal", url: "https://marketplace.visualstudio.com/items?itemName=kaitlynparsons.code-health&ssr=false#review-details" }), "aria-label": "Feedback", children: "Feedback" }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => postMessage({ type: "ready" }), "aria-label": "Refresh", children: "Refresh" })
-        ] })
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => postMessage({ type: "ready" }), "aria-label": "Refresh", children: "Refresh" })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "section", children: [
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { children: "Summary" }),

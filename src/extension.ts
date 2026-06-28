@@ -45,7 +45,7 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 export function activate(context: vscode.ExtensionContext) {
 	const provider = new CodeHealthViewProvider(context.extensionUri);
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider('code-health.view', provider)
+		vscode.window.registerWebviewViewProvider('code-health-sidebar', provider)
 	);
 }
 
