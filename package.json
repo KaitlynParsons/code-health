@@ -1,7 +1,8 @@
 {
   "name": "code-health",
   "displayName": "Code Health",
-  "description": "An extension to analyse the health of your codebase.",
+  "description": "Your ultimate code health visibility tool (VSCode extension).",
+  "author": "Kaitlyn Parsons",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.125.0"
