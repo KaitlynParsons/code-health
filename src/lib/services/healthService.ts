@@ -2,13 +2,13 @@ import * as vscode from 'vscode';
 import * as esbuild from 'esbuild';
 import * as zlib from 'zlib';
 import { AsyncResult, BundleInfo, BundleSize, ModuleNode, SmellMap } from "../../types";
-import { findUnusedExports } from "../utils/findUnusedExports";
+import { findFallowSmells } from "../utils/findFallowSmells";
 import { findUnusedImports } from "../utils/findUnusedImports";
 import { findLongParamFunctions } from "../utils/findLongParamFunctions";
-import { findDuplicateCode } from "../utils/findDuplicateCode";
 import { findBarrelFiles } from "../utils/findBarrelFiles";
 import { createProgramForRoot } from "../utils/createProgram";
 import { tryAsync } from "../utils/asyncResult";
+import { isInDotFolder } from "../utils/isInDotFolder";
 import path from 'path';
 
 export interface HealthApi {
@@ -48,17 +48,19 @@ export const createHealthApi = (): HealthApi => {
           for (const folder of vscode.workspace.workspaceFolders ?? []) {
               const program = createProgramForRoot(folder.uri.fsPath);
               const sourceFiles = program.getSourceFiles().filter(
-                  f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f)
+                  f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f) && !isInDotFolder(f.fileName)
               );
 
-              const unusedImports = findUnusedImports(program);
-              const unusedExports = findUnusedExports(program, sourceFiles);
-              const longParams = findLongParamFunctions(program, sourceFiles);
-              const duplicates = await findDuplicateCode(folder.uri.fsPath);
-              const barrels = findBarrelFiles(sourceFiles);
+              const workspaceUri = folder.uri.toString();
+              const [{ dead, duplicate }, longParams, barrels, unusedImports] = await Promise.all([
+                  findFallowSmells(folder.uri.fsPath, workspaceUri),
+                  findLongParamFunctions(folder.uri.fsPath, workspaceUri),
+                  Promise.resolve(findBarrelFiles(sourceFiles, workspaceUri)),
+                  Promise.resolve(findUnusedImports(program, sourceFiles, workspaceUri)),
+              ]);
 
-              codeSmells["dead"] = [...unusedExports, ...unusedImports];
-              codeSmells["duplicate"] = duplicates;
+              codeSmells["dead"] = [...dead, ...unusedImports];
+              codeSmells["duplicate"] = duplicate;
               codeSmells["longParams"] = longParams;
               codeSmells["barrel"] = barrels;
             }

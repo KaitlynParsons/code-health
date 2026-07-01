@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import type { AsyncResult, Smell, SmellMap } from '../../types';
 
 const smellTypeLabel: Record<string, string> = {
@@ -28,7 +28,41 @@ const Container = ({ children }: { children: ReactNode }) => {
 	);
 }
 
-export const SmellDetails = ({ smells }: { smells: AsyncResult<SmellMap> }) => {
+const SmellGroup = ({ type, items, postMessage }: { type: string; items: Smell[]; postMessage: (msg: unknown) => void }) => {
+	return (
+		<details>
+			<summary>
+				<span>{formatType(type)}</span>
+				<span>{items.length}</span>
+			</summary>
+			<table>
+				<thead>
+					<tr>
+						<th>File</th>
+						<th>Message</th>
+					</tr>
+				</thead>
+				<tbody>
+					{items.map(({ file, workspaceUri, startLine, endLine, message }) => {
+						const key = `${file}:${startLine}`;
+						return (
+							<tr key={key}>
+								<td>
+									<button className="link" onClick={() => postMessage({ type: 'openFile', file, workspaceUri, line: startLine })}>
+										{`${file}:${startLine}:${endLine}`}
+									</button>
+								</td>
+								<td>{message}</td>
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
+		</details>
+	);
+};
+
+export const SmellDetails = ({ smells, postMessage }: { smells: AsyncResult<SmellMap>, postMessage: (msg: unknown) => void }) => {
 	if (smells.state === 'loading') {
 		return (
 			<Container>
@@ -59,18 +93,7 @@ export const SmellDetails = ({ smells }: { smells: AsyncResult<SmellMap> }) => {
 	return (
 		<Container>
 			{Object.entries(smells.data).map(([type, items]) => (
-				<details key={type}>
-					<summary>
-						<span>{formatType(type)}</span>
-						<span>{items.length}</span>
-					</summary>
-					{items.map(({ file, startLine, endLine, message }) => (
-						<div className="row" key={`${file}:${startLine}`}>
-							<span>{`${file}:${startLine}:${endLine}`}</span>
-							<span>{message}</span>
-						</div>
-					))}
-				</details>
+				<SmellGroup key={type} type={type} items={items} postMessage={postMessage} />
 			))}
 			<p className="note">Some results may be false positives. Use your judgment before acting on them.</p>
 		</Container>

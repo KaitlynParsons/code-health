@@ -21793,7 +21793,28 @@
       children
     ] });
   };
-  var SmellDetails = ({ smells }) => {
+  var SmellGroup = ({ type, items, postMessage }) => {
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("details", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: formatType(type) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: items.length })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("table", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("tr", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { children: "File" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { children: "Message" })
+        ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("tbody", { children: items.map(({ file, workspaceUri, startLine, endLine, message }) => {
+          const key = `${file}:${startLine}`;
+          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("tr", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "link", onClick: () => postMessage({ type: "openFile", file, workspaceUri, line: startLine }), children: `${file}:${startLine}:${endLine}` }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { children: message })
+          ] }, key);
+        }) })
+      ] })
+    ] });
+  };
+  var SmellDetails = ({ smells, postMessage }) => {
     if (smells.state === "loading") {
       return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Container, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SkeletonGroup, {}),
@@ -21819,16 +21840,7 @@
       ] }) });
     }
     return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Container, { children: [
-      Object.entries(smells.data).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("details", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("summary", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: formatType(type) }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: items.length })
-        ] }),
-        items.map(({ file, startLine, endLine, message }) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "row", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: `${file}:${startLine}:${endLine}` }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: message })
-        ] }, `${file}:${startLine}`))
-      ] }, type)),
+      Object.entries(smells.data).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SmellGroup, { type, items, postMessage }, type)),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "note", children: "Some results may be false positives. Use your judgment before acting on them." })
     ] });
   };
@@ -21890,7 +21902,7 @@
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { children: "Summary" }),
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(SummaryCard, { bundle: results?.bundle || LOADING, smells: results?.smells || LOADING })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(SmellDetails, { smells: results?.smells || LOADING }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(SmellDetails, { smells: results?.smells || LOADING, postMessage }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InternalBundleCard, { bundle: results?.bundle || LOADING })
     ] });
   };

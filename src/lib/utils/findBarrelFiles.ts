@@ -6,7 +6,7 @@ import { getLineRange } from './getLineRange';
 
 const MIN_REEXPORTS = 1;
 
-export const findBarrelFiles = (sourceFiles: ts.SourceFile[]): Smell[] => {
+export const findBarrelFiles = (sourceFiles: ts.SourceFile[], workspaceUri: string): Smell[] => {
     const results: Smell[] = [];
 
     for (const sourceFile of sourceFiles) {
@@ -31,6 +31,7 @@ export const findBarrelFiles = (sourceFiles: ts.SourceFile[]): Smell[] => {
 
         results.push({
             file: vscode.workspace.asRelativePath(sourceFile.fileName),
+            workspaceUri,
             startLine: startLine + 1,
             endLine: endLine + 1,
             message: `Barrel file with ${reexports.length} re-exports. Barrel files degrade build performance and tree-shaking.`,

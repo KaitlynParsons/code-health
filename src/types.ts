@@ -8,6 +8,7 @@ export type AsyncResult<T> =
 
 export interface Smell {
 	file: File;
+	workspaceUri: string;
 	startLine: number;
 	endLine: number;
 	message: string;

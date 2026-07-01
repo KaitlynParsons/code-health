@@ -167,3 +167,18 @@ button {
 button:hover {
 	background-color: var(--vscode-button-hoverBackground);
 }
+
+button.link {
+	background: none;
+	color: var(--vscode-textLink-foreground);
+	padding: 0;
+	border-radius: 0;
+	font-family: var(--vscode-editor-font-family, monospace);
+	font-size: inherit;
+	text-align: left;
+}
+
+button.link:hover {
+	background: none;
+	text-decoration: underline;
+}

@@ -38,7 +38,7 @@ export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) =>
 				<h2>Summary</h2>
 				<SummaryCard bundle={results?.bundle || LOADING} smells={results?.smells || LOADING} />
 			</div>
-			<SmellDetails smells={results?.smells || LOADING} />
+			<SmellDetails smells={results?.smells || LOADING} postMessage={postMessage} />
 			<InternalBundleCard bundle={results?.bundle || LOADING} />
 		</>
 	);

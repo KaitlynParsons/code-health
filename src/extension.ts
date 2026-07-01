@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { healthApi } from './lib/services/healthService';
+import { AppMessage, createMessageApi, handleMessage } from './lib/services/messageService';
 
 class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 	constructor(private readonly extensionUri: vscode.Uri) {}
@@ -22,22 +22,11 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 			.replace('{{iconUri}}', iconUri.toString())
 			.replace('{{stylesheet}}', stylesheetUri.toString());
 
-		webviewView.webview.onDidReceiveMessage(async message => {
-			if (message.type === 'openExternal') {
-				vscode.env.openExternal(vscode.Uri.parse(message.url));
-			} else if (message.type === 'ready') {
-				webviewView.webview.postMessage({
-					type: 'results',
-					data: { bundle: { state: 'loading' }, smells: { state: 'loading' } },
-				});
-
-				const [bundle, smells] = await Promise.all([healthApi.internalSize(), healthApi.codeSmells()]);
-
-				webviewView.webview.postMessage({
-					type: 'results',
-					data: { bundle, smells },
-				});
-			}
+		const messageApi = createMessageApi(webviewView.webview);
+		webviewView.webview.onDidReceiveMessage((message: AppMessage) => {
+			handleMessage(message, messageApi).catch(err => {
+				vscode.window.showErrorMessage(`Code Health: ${err instanceof Error ? err.message : String(err)}`);
+			});
 		});
 	}
 }
