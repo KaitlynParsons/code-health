@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import ts from 'typescript';
 
 import type { Smell } from '../../types';
@@ -24,7 +23,12 @@ function isInsideImport(node: ts.Node): boolean {
     return false;
 }
 
-export const findUnusedImports = (program: ts.Program, sourceFiles: readonly ts.SourceFile[], workspaceUri: string): Smell[] => {
+export const findUnusedImports = (
+    program: ts.Program,
+    sourceFiles: readonly ts.SourceFile[],
+    workspaceUri: string,
+    toRelativePath: (abs: string) => string,
+): Smell[] => {
     const results: Smell[] = [];
 
     for (const sourceFile of sourceFiles) {
@@ -42,7 +46,7 @@ export const findUnusedImports = (program: ts.Program, sourceFiles: readonly ts.
                 : diag.messageText.messageText;
 
             results.push({
-                file: vscode.workspace.asRelativePath(sourceFile.fileName),
+                file: toRelativePath(sourceFile.fileName),
                 workspaceUri,
                 startLine: line + 1,
                 endLine: line + 1,

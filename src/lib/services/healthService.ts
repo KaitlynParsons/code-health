@@ -1,72 +1,64 @@
 import * as vscode from 'vscode';
-import * as esbuild from 'esbuild';
-import * as zlib from 'zlib';
-import { AsyncResult, BundleInfo, BundleSize, ModuleNode, SmellMap } from "../../types";
+import { AsyncResult, BundleInfo, BundleSize, ModuleNode, Smell, SmellMap } from "../../types";
 import { findFallowSmells } from "../utils/findFallowSmells";
-import { findUnusedImports } from "../utils/findUnusedImports";
 import { findLongParamFunctions } from "../utils/findLongParamFunctions";
-import { findBarrelFiles } from "../utils/findBarrelFiles";
-import { createProgramForRoot } from "../utils/createProgram";
+import { resolveConfigPathsForRoot } from "../utils/createProgram";
+import { runAnalysisWorker } from "../utils/runAnalysisWorker";
 import { tryAsync } from "../utils/asyncResult";
-import { isInDotFolder } from "../utils/isInDotFolder";
-import path from 'path';
 
 export interface HealthApi {
   readonly internalSize: () => Promise<AsyncResult<BundleInfo>>;
   readonly codeSmells: () => Promise<AsyncResult<SmellMap>>;
 }
 
-export const createHealthApi = (): HealthApi => {
-    return {
-        internalSize: () => tryAsync(async () => {
-            const nodes: ModuleNode[] = [];
-            const total: BundleSize = { uncompressed: 0, compressed: 0 };
+type FolderConfig = { configPath: string; folder: vscode.WorkspaceFolder };
 
-            for (const folder of vscode.workspace.workspaceFolders ?? []) {
-                const program = createProgramForRoot(folder.uri.fsPath);
-                const sourceFiles = program.getSourceFiles().filter(
-                    f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f)
-                );
+const toFolderConfigs = (folders: readonly vscode.WorkspaceFolder[]): FolderConfig[] =>
+    folders.flatMap(folder =>
+        resolveConfigPathsForRoot(folder.uri.fsPath).map(configPath => ({ configPath, folder }))
+    );
 
-                await Promise.all(sourceFiles.map(async (sourceFile) => {
-                    const fileName = vscode.workspace.asRelativePath(sourceFile.fileName);
-                    const ext = path.extname(sourceFile.fileName).slice(1);
-                    const loader = (ext === 'tsx' || ext === 'jsx') ? ext : ext === 'ts' ? 'ts' : 'js';
-                    const { code } = await esbuild.transform(sourceFile.text, { loader, minify: true, sourcefile: fileName });
-                    const uncompressed = Buffer.byteLength(code, 'utf8');
-                    const compressed = zlib.gzipSync(code).byteLength;
-                    total.compressed += compressed;
-                    total.uncompressed += uncompressed;
-                    nodes.push({ file: fileName, uncompressed, compressed });
-                }));
+const sumUncompressed = (nodes: ModuleNode[]): BundleSize =>
+    nodes.reduce((sum, { uncompressed }) => ({ uncompressed: sum.uncompressed + uncompressed }), { uncompressed: 0 });
+
+export const createHealthApi = (getFolders: () => readonly vscode.WorkspaceFolder[] | undefined): HealthApi => ({
+    internalSize: () => tryAsync(async () => {
+        const folderConfigs = toFolderConfigs(getFolders() ?? []);
+        const moduleArrays: ModuleNode[] = [];
+        for (const { configPath, folder } of folderConfigs) {
+            const { modules } = await runAnalysisWorker(configPath, folder.uri.fsPath, folder.uri.toString(), ['bundle']);
+            moduleArrays.push(...modules);
+        }
+        return { nodes: moduleArrays, total: sumUncompressed(moduleArrays) };
+    }),
+
+    codeSmells: () => tryAsync(async () => {
+        const folders = getFolders() ?? [];
+        let codeSmells: SmellMap = {};
+
+        for (const folder of folders) {
+            const rootPath = folder.uri.fsPath;
+            const workspaceUri = folder.uri.toString();
+
+            const [{ dead, duplicate }, longParams] = await Promise.all([
+                findFallowSmells(rootPath, workspaceUri),
+                findLongParamFunctions(rootPath, workspaceUri),
+            ]);
+
+            const smellArrays: Smell[] = [];
+            for (const configPath of resolveConfigPathsForRoot(rootPath)) {
+                const { smells } = await runAnalysisWorker(configPath, rootPath, workspaceUri, ['smells']);
+                smellArrays.push(...smells);
             }
 
-            return { internal: { nodes, total } };
-        }),
-        codeSmells: () => tryAsync(async () => {
-          const codeSmells: SmellMap = {};
-          for (const folder of vscode.workspace.workspaceFolders ?? []) {
-              const program = createProgramForRoot(folder.uri.fsPath);
-              const sourceFiles = program.getSourceFiles().filter(
-                  f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f) && !isInDotFolder(f.fileName)
-              );
+            codeSmells = {
+                dead: [...dead, ...smellArrays.filter(s => s.type === 'dead')],
+                duplicate,
+                longParams,
+                barrel: smellArrays.filter(s => s.type === 'barrel'),
+            };
+        }
 
-              const workspaceUri = folder.uri.toString();
-              const [{ dead, duplicate }, longParams, barrels, unusedImports] = await Promise.all([
-                  findFallowSmells(folder.uri.fsPath, workspaceUri),
-                  findLongParamFunctions(folder.uri.fsPath, workspaceUri),
-                  Promise.resolve(findBarrelFiles(sourceFiles, workspaceUri)),
-                  Promise.resolve(findUnusedImports(program, sourceFiles, workspaceUri)),
-              ]);
-
-              codeSmells["dead"] = [...dead, ...unusedImports];
-              codeSmells["duplicate"] = duplicate;
-              codeSmells["longParams"] = longParams;
-              codeSmells["barrel"] = barrels;
-            }
-            return codeSmells;
-        }),
-    };
-};
-
-export const healthApi = createHealthApi();
+        return codeSmells;
+    }),
+});

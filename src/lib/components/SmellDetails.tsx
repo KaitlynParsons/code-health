@@ -95,7 +95,7 @@ export const SmellDetails = ({ smells, postMessage }: { smells: AsyncResult<Smel
 			{Object.entries(smells.data).map(([type, items]) => (
 				<SmellGroup key={type} type={type} items={items} postMessage={postMessage} />
 			))}
-			<p className="note">Some results may be false positives. Use your judgment before acting on them.</p>
+			<p className="note">Some results may be false positives.</p>
 		</Container>
 	);
 };

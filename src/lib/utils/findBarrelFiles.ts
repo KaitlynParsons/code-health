@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import ts from 'typescript';
 
 import type { Smell } from '../../types';
@@ -6,7 +5,11 @@ import { getLineRange } from './getLineRange';
 
 const MIN_REEXPORTS = 1;
 
-export const findBarrelFiles = (sourceFiles: ts.SourceFile[], workspaceUri: string): Smell[] => {
+export const findBarrelFiles = (
+    sourceFiles: ts.SourceFile[],
+    workspaceUri: string,
+    toRelativePath: (abs: string) => string,
+): Smell[] => {
     const results: Smell[] = [];
 
     for (const sourceFile of sourceFiles) {
@@ -30,7 +33,7 @@ export const findBarrelFiles = (sourceFiles: ts.SourceFile[], workspaceUri: stri
         );
 
         results.push({
-            file: vscode.workspace.asRelativePath(sourceFile.fileName),
+            file: toRelativePath(sourceFile.fileName),
             workspaceUri,
             startLine: startLine + 1,
             endLine: endLine + 1,

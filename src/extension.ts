@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { AppMessage, createMessageApi, handleMessage } from './lib/services/messageService';
+import { createHealthApi } from './lib/services/healthService';
 
 class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 	constructor(private readonly extensionUri: vscode.Uri) {}
@@ -22,7 +23,7 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 			.replace('{{iconUri}}', iconUri.toString())
 			.replace('{{stylesheet}}', stylesheetUri.toString());
 
-		const messageApi = createMessageApi(webviewView.webview);
+		const messageApi = createMessageApi(webviewView.webview, createHealthApi(() => vscode.workspace.workspaceFolders));
 		webviewView.webview.onDidReceiveMessage((message: AppMessage) => {
 			handleMessage(message, messageApi).catch(err => {
 				vscode.window.showErrorMessage(`Code Health: ${err instanceof Error ? err.message : String(err)}`);

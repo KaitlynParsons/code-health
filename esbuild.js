@@ -38,6 +38,20 @@ async function main() {
 		plugins: [esbuildProblemMatcherPlugin],
 	});
 
+	const workerCtx = await esbuild.context({
+		entryPoints: ['src/lib/workers/analysisWorker.ts'],
+		bundle: true,
+		format: 'cjs',
+		minify: production,
+		sourcemap: !production,
+		sourcesContent: false,
+		platform: 'node',
+		outfile: 'dist/analysisWorker.js',
+		external: ['esbuild'],
+		logLevel: 'silent',
+		plugins: [esbuildProblemMatcherPlugin],
+	});
+
 	const webviewCtx = await esbuild.context({
 		entryPoints: ['src/index.tsx'],
 		bundle: true,
@@ -52,10 +66,10 @@ async function main() {
 	});
 
 	if (watch) {
-		await Promise.all([extensionCtx.watch(), webviewCtx.watch()]);
+		await Promise.all([extensionCtx.watch(), workerCtx.watch(), webviewCtx.watch()]);
 	} else {
-		await Promise.all([extensionCtx.rebuild(), webviewCtx.rebuild()]);
-		await Promise.all([extensionCtx.dispose(), webviewCtx.dispose()]);
+		await Promise.all([extensionCtx.rebuild(), workerCtx.rebuild(), webviewCtx.rebuild()]);
+		await Promise.all([extensionCtx.dispose(), workerCtx.dispose(), webviewCtx.dispose()]);
 	}
 }
 

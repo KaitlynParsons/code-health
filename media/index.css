@@ -145,14 +145,26 @@ summary > span:last-child {
 	background-color: #4caf50;
 }
 
-.health-bar__fill--smelly {
+.health-bar__fill--warning {
 	background-color: #f0b429;
+}
+
+.health-bar__fill--critical {
+	background-color: #e53935;
+}
+
+.health-bar__fill--smelly {
+	background-color: #6b7280;
 }
 
 .health-bar__label {
 	margin: 6px 0 0 0;
 	font-size: 0.85em;
 	color: var(--vscode-foreground);
+}
+
+.health-bar__heart {
+	color: #e53935;
 }
 
 button {

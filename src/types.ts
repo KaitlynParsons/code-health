@@ -20,8 +20,6 @@ export type SmellMap = Record<string, Smell[]>;
 export interface BundleSize {
 	/** Byte size of the minified JS output via esbuild */
 	uncompressed: number;
-	/** Byte size of the minified JS after gzip compression */
-	compressed: number;
 }
 
 export interface ModuleNode extends BundleSize {
@@ -30,8 +28,6 @@ export interface ModuleNode extends BundleSize {
 }
 
 export interface BundleInfo {
-	internal: {
-		nodes: ModuleNode[];
-		total: BundleSize;
-	}
+	nodes: ModuleNode[];
+	total: BundleSize;
 }

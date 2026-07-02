@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { healthApi } from './healthService';
+import { HealthApi } from './healthService';
 
 export type AppMessage =
 	| { type: 'openFile'; workspaceUri: string; file: string; line: number }
@@ -10,7 +10,7 @@ interface MessageApi {
 	readonly ready: () => Promise<void>;
 }
 
-export const createMessageApi = (webview: vscode.Webview): MessageApi => {
+export const createMessageApi = (webview: vscode.Webview, healthApi: HealthApi): MessageApi => {
 	const postResults = async () => {
 		webview.postMessage({ type: 'results', data: { bundle: { state: 'loading' }, smells: { state: 'loading' } } });
 		const [bundle, smells] = await Promise.all([healthApi.internalSize(), healthApi.codeSmells()]);
