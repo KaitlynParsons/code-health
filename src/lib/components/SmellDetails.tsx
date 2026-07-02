@@ -28,36 +28,39 @@ const Container = ({ children }: { children: ReactNode }) => {
 	);
 }
 
+const FileGroup = ({ file, items, postMessage }: { file: string; items: Smell[]; postMessage: (msg: unknown) => void }) => (
+	<details>
+		<summary>
+			<span>{file}</span>
+			<span>{items.length}</span>
+		</summary>
+		<ul>
+			{items.map(({ workspaceUri, startLine, message }) => (
+				<li key={`${startLine}:${message}`}>
+					<button className="link" onClick={() => postMessage({ type: 'openFile', file, workspaceUri, line: startLine })}>
+						{message}
+					</button>
+				</li>
+			))}
+		</ul>
+	</details>
+);
+
 const SmellGroup = ({ type, items, postMessage }: { type: string; items: Smell[]; postMessage: (msg: unknown) => void }) => {
+	const byFile = items.reduce<Record<string, Smell[]>>((acc, smell) => {
+		(acc[smell.file] ??= []).push(smell);
+		return acc;
+	}, {});
+
 	return (
 		<details>
 			<summary>
 				<span>{formatType(type)}</span>
 				<span>{items.length}</span>
 			</summary>
-			<table>
-				<thead>
-					<tr>
-						<th>File</th>
-						<th>Message</th>
-					</tr>
-				</thead>
-				<tbody>
-					{items.map(({ file, workspaceUri, startLine, endLine, message }) => {
-						const key = `${file}:${startLine}`;
-						return (
-							<tr key={key}>
-								<td>
-									<button className="link" onClick={() => postMessage({ type: 'openFile', file, workspaceUri, line: startLine })}>
-										{`${file}:${startLine}:${endLine}`}
-									</button>
-								</td>
-								<td>{message}</td>
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
+			{Object.entries(byFile).map(([file, fileItems]) => (
+				<FileGroup key={file} file={file} items={fileItems} postMessage={postMessage} />
+			))}
 		</details>
 	);
 };

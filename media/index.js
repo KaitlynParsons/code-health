@@ -21748,25 +21748,24 @@
       children
     ] });
   };
+  var FileGroup = ({ file, items, postMessage }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("details", { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("summary", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: file }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: items.length })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", { children: items.map(({ workspaceUri, startLine, message }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "link", onClick: () => postMessage({ type: "openFile", file, workspaceUri, line: startLine }), children: message }) }, `${startLine}:${message}`)) })
+  ] });
   var SmellGroup = ({ type, items, postMessage }) => {
+    const byFile = items.reduce((acc, smell) => {
+      (acc[smell.file] ??= []).push(smell);
+      return acc;
+    }, {});
     return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("details", { children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("summary", { children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: formatType(type) }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: items.length })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { children: "File" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { children: "Message" })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: items.map(({ file, workspaceUri, startLine, endLine, message }) => {
-          const key = `${file}:${startLine}`;
-          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "link", onClick: () => postMessage({ type: "openFile", file, workspaceUri, line: startLine }), children: `${file}:${startLine}:${endLine}` }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { children: message })
-          ] }, key);
-        }) })
-      ] })
+      Object.entries(byFile).map(([file, fileItems]) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileGroup, { file, items: fileItems, postMessage }, file))
     ] });
   };
   var SmellDetails = ({ smells, postMessage }) => {
