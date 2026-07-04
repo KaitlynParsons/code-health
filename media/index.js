@@ -21876,7 +21876,7 @@
     return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "row", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h1", { children: "Report" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => postMessage({ type: "ready" }), "aria-label": "Scan", children: "Scan" })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => postMessage({ type: "ready" }), "aria-label": "Refresh", children: "Refresh" })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "section", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { children: "Summary" }),

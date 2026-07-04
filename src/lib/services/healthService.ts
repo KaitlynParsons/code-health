@@ -11,25 +11,30 @@ export interface HealthApi {
   readonly generateReport: () => Promise<AsyncResult<Report>>;
 }
 
-type FolderConfig = { configPath: string; folder: vscode.WorkspaceFolder };
-
-const toFolderConfigs = (folders: readonly vscode.WorkspaceFolder[]): FolderConfig[] =>
-    folders.flatMap(folder =>
-        resolveConfigPaths(folder.uri.fsPath).map(configPath => ({ configPath, folder }))
-    );
-
 const sumUncompressed = (nodes: ModuleNode[]): ModuleNode["uncompressed"] =>
     nodes.reduce((sum, { uncompressed }) => sum + uncompressed, 0);
 
-const generateReport = async ({ configPath, folder }: FolderConfig): Promise<Report> => {
-    const rootPath = path.dirname(configPath);
+const generateReport = async (folder: vscode.WorkspaceFolder): Promise<Report> => {
+    const configPaths = resolveConfigPaths(folder.uri.fsPath);
     const workspaceUri = folder.uri.toString();
 
-    const [{ dead, duplicate }, longParams, { modules, smells: workerSmells }] = await Promise.all([
-        findFallowSmells(rootPath, workspaceUri),
-        findLongParamFunctions(rootPath, workspaceUri),
-        runAnalysisWorker(configPath, rootPath, workspaceUri, ['bundle', 'smells']),
+    // Deduplicate root directories so fallow/longParams don't run multiple times on the
+    // same directory (e.g. composite tsconfig.json with all file refs in the same dir)
+    const uniqueRoots = [...new Set(configPaths.map(p => path.dirname(p)))];
+
+    const [fallowResults, longParamResults, ...workerResults] = await Promise.all([
+        Promise.all(uniqueRoots.map(rootPath => findFallowSmells(rootPath, workspaceUri))),
+        Promise.all(uniqueRoots.map(rootPath => findLongParamFunctions(rootPath, workspaceUri))),
+        ...configPaths.map(configPath =>
+            runAnalysisWorker(configPath, path.dirname(configPath), workspaceUri, ['bundle', 'smells'])
+        ),
     ]);
+
+    const dead = fallowResults.flatMap(r => r.dead);
+    const duplicate = fallowResults.flatMap(r => r.duplicate);
+    const longParams = longParamResults.flat();
+    const modules = workerResults.flatMap(r => r.modules);
+    const workerSmells = workerResults.flatMap(r => r.smells);
 
     return {
         bundle: sumUncompressed(modules),
@@ -44,7 +49,7 @@ const generateReport = async ({ configPath, folder }: FolderConfig): Promise<Rep
 
 export const createHealthApi = (getFolders: () => readonly vscode.WorkspaceFolder[] | undefined): HealthApi => ({
     generateReport: () => tryAsync(async () => {
-        const reports = await Promise.all(toFolderConfigs(getFolders() ?? []).map(generateReport));
+        const reports = await Promise.all((getFolders() ?? []).map(generateReport));
         return reports.reduce<Report>(
             (acc, { bundle, smells }) => ({
                 bundle: (acc.bundle + bundle),

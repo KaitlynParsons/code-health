@@ -29,8 +29,8 @@ export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) =>
 		<>
 			<div className='row'>
 				<h1>Report</h1>
-				<button onClick={() => postMessage({ type: 'ready' })} aria-label="Scan">
-					Scan
+				<button onClick={() => postMessage({ type: 'ready' })} aria-label="Refresh">
+					Refresh
 				</button>
 			</div>
 			<div className='section'>

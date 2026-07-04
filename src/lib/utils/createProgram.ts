@@ -28,8 +28,11 @@ export const resolveConfigPaths = (rootPath: string): string[] => {
 	const references: Array<{ path: string }> = raw.config?.references ?? [];
 
 	return references.length > 0 ? references.flatMap(ref => {
-		const refDir = path.resolve(path.dirname(rootConfig), ref.path);
-		const refConfig = ts.findConfigFile(refDir, ts.sys.fileExists, 'tsconfig.json');
+		const refPath = path.resolve(path.dirname(rootConfig), ref.path);
+		if (ref.path.endsWith('.json')) {
+			return ts.sys.fileExists(refPath) ? [refPath] : [];
+		}
+		const refConfig = ts.findConfigFile(refPath, ts.sys.fileExists, 'tsconfig.json');
 		return refConfig ? [refConfig] : [];
 	}) : [rootConfig];
 };
