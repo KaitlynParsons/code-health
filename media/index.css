@@ -142,15 +142,15 @@ summary > span:last-child {
 }
 
 .health-bar__fill--healthy {
-	background-color: #4caf50;
+	background-color: var(--vscode-charts-green);
 }
 
 .health-bar__fill--warning {
-	background-color: #f0b429;
+	background-color: var(--vscode-charts-yellow);
 }
 
 .health-bar__fill--critical {
-	background-color: #e53935;
+	background-color: var(--vscode-charts-red);
 }
 
 .health-bar__fill--smelly {
@@ -164,7 +164,7 @@ summary > span:last-child {
 }
 
 .health-bar__heart {
-	color: #e53935;
+	color: var(--vscode-charts-red);
 }
 
 button {
