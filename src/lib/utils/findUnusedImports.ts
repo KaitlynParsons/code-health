@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
-import type { Smell } from '../../types';
-import { isInDotFolder, trampoline, type Step } from './helpers';
+import type { Smell, Step } from '../../types';
+import { isInDotFolder, trampoline } from './helpers';
 
 const UNUSED_LOCAL = 6133;
 

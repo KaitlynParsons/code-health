@@ -48,3 +48,5 @@ export interface OxlintOutput {
 		}>;
 	}[];
 }
+
+export type Step<T> = T | (() => Step<T>);

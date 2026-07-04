@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import * as path from 'path';
 import { spawn } from 'child_process';
-import { AsyncResult } from '../../types';
+import { AsyncResult, Step } from '../../types';
 
 const getLineEnd = (sourceFile: ts.SourceFile, endLine: number): number => {
 	const lineStarts = sourceFile.getLineStarts();
@@ -22,7 +22,6 @@ export const getLineRange = (
 	};
 };
 
-export type Step<T> = T | (() => Step<T>);
 export const trampoline = <A extends unknown[], T>(
     fn: (...args: A) => Step<T>,
 ) => (...args: A): T => {
