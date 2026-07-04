@@ -51,24 +51,16 @@ export const tryParseJson = <T>(json: string): T | null => {
 export const isInDotFolder = (filePath: string): boolean =>
     filePath.split(/[\\/]/).some(s => s.startsWith('.') && s.length > 1 && s !== '..');
 
-const oxlintBin = path.join(__dirname, '..', 'node_modules', 'oxlint', 'bin', 'oxlint');
-export const spawnOxlint = (args: string[]): Promise<string> => {
-	return new Promise((resolve, reject) => {
-		let stdout = '';
-		const proc = spawn(process.execPath, [oxlintBin, ...args], { stdio: ['pipe', 'pipe', 'pipe'] });
-		proc.stdout.on('data', (chunk: Buffer) => { stdout += chunk.toString(); });
-		proc.on('close', () => resolve(stdout));
-		proc.on('error', reject);
-	});
-};
+const bins = {
+	oxlint: path.join(__dirname, '..', 'node_modules', 'oxlint', 'bin', 'oxlint'),
+	fallow:  path.join(__dirname, '..', 'node_modules', 'fallow',  'bin', 'fallow'),
+} as const;
 
-const fallowBin = path.join(__dirname, '..', 'node_modules', 'fallow', 'bin', 'fallow');
-export const spawnFallow = (args: string[]): Promise<string> => {
-	return new Promise((resolve, reject) => {
+export const spawnTool = (tool: keyof typeof bins, args: string[]): Promise<string> =>
+	new Promise((resolve, reject) => {
 		let stdout = '';
-		const proc = spawn(process.execPath, [fallowBin, ...args], { stdio: ['pipe', 'pipe', 'pipe'] });
+		const proc = spawn(process.execPath, [bins[tool], ...args], { stdio: ['pipe', 'pipe', 'pipe'] });
 		proc.stdout.on('data', (chunk: Buffer) => { stdout += chunk.toString(); });
 		proc.on('close', () => resolve(stdout));
 		proc.on('error', reject);
 	});
-};

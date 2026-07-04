@@ -2,34 +2,30 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import type { Smell } from '../../types';
-import { tryParseJson, spawnFallow } from './helpers';
-
-interface FallowUnusedExport {
-    path: string;
-    export_name: string;
-    line: number;
-}
-
-interface FallowUnresolvedImport {
-    path: string;
-    specifier: string;
-    line: number;
-}
+import { tryParseJson, spawnTool } from './helpers';
 
 interface FallowDeadCodeOutput {
-    unused_exports?: FallowUnusedExport[];
-    unresolved_imports?: FallowUnresolvedImport[];
-}
-
-interface FallowCloneInstance {
-    file: string;
-    start_line: number;
-    end_line: number;
-    fragment?: string;
+    unused_exports?: {
+        path: string;
+        export_name: string;
+        line: number;
+    }[];
+    unresolved_imports?: {
+        path: string;
+        specifier: string;
+        line: number;
+    }[];
 }
 
 interface FallowDupesOutput {
-    clone_groups?: Array<{ instances: FallowCloneInstance[] }>;
+    clone_groups?: Array<{ 
+        instances: {
+            file: string;
+            start_line: number;
+            end_line: number;
+            fragment?: string;
+        }[] 
+    }>;
 }
 
 const parseDeadCode = (stdout: string, rootPath: string, workspaceUri: string): Smell[] =>
@@ -70,8 +66,8 @@ const parseDuplicates = (stdout: string, rootPath: string, workspaceUri: string)
 export const findFallowSmells = async (rootPath: string, workspaceUri: string): Promise<{ dead: Smell[]; duplicate: Smell[] }> => {
     const args = ['--format', 'json', '--quiet', '--no-cache', '-r', rootPath];
     const [deadStdout, dupesStdout] = await Promise.all([
-        spawnFallow(['dead-code', ...args]),
-        spawnFallow(['dupes', ...args]),
+        spawnTool('fallow', ['dead-code', ...args]),
+        spawnTool('fallow', ['dupes', ...args]),
     ]);
 
     return {

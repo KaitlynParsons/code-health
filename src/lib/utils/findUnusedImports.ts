@@ -5,14 +5,14 @@ import { isInDotFolder, trampoline } from './helpers';
 
 const UNUSED_LOCAL = 6133;
 
-function nodeAtPosition(sourceFile: ts.SourceFile, position: number): ts.Node | undefined {
+const nodeAtPosition = (sourceFile: ts.SourceFile, position: number): ts.Node | undefined => {
     const visit = (node: ts.Node): ts.Node | undefined => {
         if (position >= node.getStart(sourceFile) && position < node.getEnd()) {
             return ts.forEachChild(node, visit) ?? node;
         }
     };
     return visit(sourceFile);
-}
+};
 
 const isInsideImportStep = (node: ts.Node): Step<boolean> =>
     ts.isImportDeclaration(node) || (node.parent ? () => isInsideImportStep(node.parent) : false);
