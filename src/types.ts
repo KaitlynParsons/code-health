@@ -17,19 +17,11 @@ export interface Smell {
 }
 export type SmellMap = Record<string, Smell[]>;
 
-export interface BundleSize {
-	/** Byte size of the minified JS output via esbuild */
-	uncompressed: number;
-}
-
-export interface ModuleNode extends BundleSize {
+export interface ModuleNode {
 	/** Workspace-relative file path */
 	file: File;
-}
-
-export interface BundleInfo {
-	nodes: ModuleNode[];
-	total: BundleSize;
+	/** Byte size of the minified JS output via esbuild */
+	uncompressed: number;
 }
 
 export interface OxlintOutput {
@@ -50,3 +42,8 @@ export interface OxlintOutput {
 }
 
 export type Step<T> = T | (() => Step<T>);
+
+export interface Report {
+    bundle: number;
+    smells: SmellMap;
+};

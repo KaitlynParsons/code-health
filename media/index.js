@@ -21835,7 +21835,7 @@
         ] })
       ] });
     }
-    const totalBytes = bundle.data.total.uncompressed;
+    const totalBytes = bundle.data;
     const smellBytes = Object.values(smells.data).flat().reduce((sum, s) => sum + s.size, 0);
     const smellPct = totalBytes > 0 ? Math.min(100, Math.round(smellBytes / totalBytes * 100)) : 0;
     const healthPct = 100 - smellPct;
@@ -21861,12 +21861,12 @@
   var import_jsx_runtime3 = __toESM(require_jsx_runtime());
   var LOADING = { state: "loading" };
   var App = ({ postMessage }) => {
-    const [results, setResults] = (0, import_react.useState)(null);
+    const [report, setReport] = (0, import_react.useState)(null);
     (0, import_react.useEffect)(() => {
       const handler = (event) => {
         const { type, data } = event.data;
         if (type === "results") {
-          setResults(data);
+          setReport(data);
         }
       };
       window.addEventListener("message", handler);
@@ -21880,9 +21880,9 @@
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "section", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { children: "Summary" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SummaryCard, { bundle: results?.bundle || LOADING, smells: results?.smells || LOADING })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SummaryCard, { bundle: report?.bundle ?? LOADING, smells: report?.smells ?? LOADING })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SmellDetails, { smells: results?.smells || LOADING, postMessage })
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SmellDetails, { smells: report?.smells ?? LOADING, postMessage })
     ] });
   };
 

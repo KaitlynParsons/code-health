@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react';
-import type { AsyncResult, BundleInfo, Smell, SmellMap } from './types';
 import { SmellDetails } from './lib/components/SmellDetails';
 import { SummaryCard } from './lib/components/SummaryCard';
+import type { AsyncResult, SmellMap } from './types';
 
-interface Results {
-	bundle: AsyncResult<BundleInfo>;
+interface ViewState {
+	bundle: AsyncResult<number>;
 	smells: AsyncResult<SmellMap>;
 }
 
 const LOADING = { state: "loading" } as const;
 
 export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) => {
-	const [results, setResults] = useState<Results | null>(null);
+	const [report, setReport] = useState<ViewState | null>(null);
 
 	useEffect(() => {
 		const handler = (event: MessageEvent) => {
 			const { type, data } = event.data;
 			if (type === 'results') {
-				setResults(data);
+				setReport(data);
 			}
 		};
 		window.addEventListener('message', handler);
@@ -35,9 +35,9 @@ export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) =>
 			</div>
 			<div className='section'>
 				<h2>Summary</h2>
-				<SummaryCard bundle={results?.bundle || LOADING} smells={results?.smells || LOADING} />
+				<SummaryCard bundle={report?.bundle ?? LOADING} smells={report?.smells ?? LOADING} />
 			</div>
-			<SmellDetails smells={results?.smells || LOADING} postMessage={postMessage} />
+			<SmellDetails smells={report?.smells ?? LOADING} postMessage={postMessage} />
 		</>
 	);
 };

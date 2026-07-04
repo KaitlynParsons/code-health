@@ -13,28 +13,23 @@ export const createProgramFromConfig = (configPath: string): ts.Program => {
 	});
 };
 
-const resolveConfigPaths = (rootPath: string): string[] => {
+export const resolveConfigPaths = (rootPath: string): string[] => {
 	const rootConfig =
 		ts.findConfigFile(rootPath, ts.sys.fileExists, 'tsconfig.json') ??
 		ts.findConfigFile(rootPath, ts.sys.fileExists, 'jsconfig.json');
 
-	if (rootConfig) {
-		const raw = ts.readConfigFile(rootConfig, ts.sys.readFile);
-		const references: Array<{ path: string }> = raw.config?.references ?? [];
-		if (references.length > 0) {
-			return references.flatMap(ref => {
-				const refDir = path.resolve(path.dirname(rootConfig), ref.path);
-				const refConfig = ts.findConfigFile(refDir, ts.sys.fileExists, 'tsconfig.json');
-				return refConfig ? [refConfig] : [];
-			});
-		}
-		return [rootConfig];
+	if (!rootConfig) {
+		// No root tsconfig — monorepo with tsconfigs only inside packages
+		const allFiles = ts.sys.readDirectory(rootPath, ['.json'], ['node_modules', '.git']);
+		return allFiles.filter(f => path.basename(f) === 'tsconfig.json');
 	}
 
-	// No root tsconfig — monorepo with tsconfigs only inside packages
-	const allFiles = ts.sys.readDirectory(rootPath, ['.json'], ['node_modules', '.git']);
-	return allFiles.filter(f => path.basename(f) === 'tsconfig.json');
-};
+	const raw = ts.readConfigFile(rootConfig, ts.sys.readFile);
+	const references: Array<{ path: string }> = raw.config?.references ?? [];
 
-export const resolveConfigPathsForRoot = (rootPath: string): string[] =>
-	resolveConfigPaths(rootPath);
+	return references.length > 0 ? references.flatMap(ref => {
+		const refDir = path.resolve(path.dirname(rootConfig), ref.path);
+		const refConfig = ts.findConfigFile(refDir, ts.sys.fileExists, 'tsconfig.json');
+		return refConfig ? [refConfig] : [];
+	}) : [rootConfig];
+};

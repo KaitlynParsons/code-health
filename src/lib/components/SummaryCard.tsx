@@ -1,7 +1,7 @@
-import type { AsyncResult, BundleInfo, SmellMap } from '../../types';
+import type { AsyncResult, ModuleNode, SmellMap } from '../../types';
 
 interface Props {
-    bundle: AsyncResult<BundleInfo>;
+    bundle: AsyncResult<ModuleNode["uncompressed"]>;
     smells: AsyncResult<SmellMap>;
 }
 
@@ -46,7 +46,7 @@ export const SummaryCard = ({ bundle, smells }: Props) => {
         );
     }
 
-    const totalBytes = bundle.data.total.uncompressed;
+    const totalBytes = bundle.data;
     const smellBytes = Object.values(smells.data).flat().reduce((sum, s) => sum + s.size, 0);
     const smellPct = totalBytes > 0 ? Math.min(100, Math.round((smellBytes / totalBytes) * 100)) : 0;
     const healthPct = 100 - smellPct;

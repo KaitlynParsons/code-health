@@ -13,8 +13,14 @@ interface MessageApi {
 export const createMessageApi = (webview: vscode.Webview, healthApi: HealthApi): MessageApi => {
 	const postResults = async () => {
 		webview.postMessage({ type: 'results', data: { bundle: { state: 'loading' }, smells: { state: 'loading' } } });
-		const [bundle, smells] = await Promise.all([healthApi.internalSize(), healthApi.codeSmells()]);
-		webview.postMessage({ type: 'results', data: { bundle, smells } });
+		const report = await healthApi.generateReport();
+		const data = report.state === 'success'
+			? { 
+				bundle: { state: 'success', data: report.data.bundle }, 
+				smells: { state: 'success', data: report.data.smells } 
+			  }
+			: { bundle: report, smells: report };
+		webview.postMessage({ type: 'results', data });
 	};
 
 	return {
