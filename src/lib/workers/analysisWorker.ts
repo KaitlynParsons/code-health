@@ -6,7 +6,7 @@ import * as esbuild from 'esbuild';
 import { createProgramFromConfig } from '../utils/createProgram';
 import { findUnusedImports } from '../utils/findUnusedImports';
 import { findBarrelFiles } from '../utils/findBarrelFiles';
-import { isInDotFolder } from '../utils/isInDotFolder';
+import { isInDotFolder } from '../utils/helpers';
 import type { Smell } from '../../types';
 
 interface WorkerInput {

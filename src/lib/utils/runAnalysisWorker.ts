@@ -52,8 +52,8 @@ export const runAnalysisWorker = (
             if (msg.type === 'smells') { 
                 result.smells.push(...msg.items); 
             }
-            if (msg.type === 'module') { 
-                result.modules.push({ file: msg.file, uncompressed: msg.uncompressed }); 
+            if (msg.type === 'module') {
+                result.modules.push({ file: msg.file, uncompressed: msg.uncompressed });
             }
             if (msg.type === 'done') { 
                 settle(() => resolve(result)); 

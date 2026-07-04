@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 import type { Smell } from '../../types';
-import { isInDotFolder } from './isInDotFolder';
+import { isInDotFolder, trampoline, type Step } from './helpers';
 
 const UNUSED_LOCAL = 6133;
 
@@ -14,48 +14,42 @@ function nodeAtPosition(sourceFile: ts.SourceFile, position: number): ts.Node | 
     return visit(sourceFile);
 }
 
-function isInsideImport(node: ts.Node): boolean {
-    let current: ts.Node | undefined = node;
-    while (current) {
-        if (ts.isImportDeclaration(current)) { return true; }
-        current = current.parent;
-    }
-    return false;
-}
+const isInsideImportStep = (node: ts.Node): Step<boolean> =>
+    ts.isImportDeclaration(node) || (node.parent ? () => isInsideImportStep(node.parent) : false);
+const isInsideImport = trampoline(isInsideImportStep);
+
+const toSmell = (
+    sourceFile: ts.SourceFile,
+    diagnostic: ts.Diagnostic,
+    workspaceUri: string,
+    toRelativePath: (abs: string) => string,
+): Smell => {
+    const line = sourceFile.getLineAndCharacterOfPosition(diagnostic.start!).line + 1;
+    return {
+        file: toRelativePath(sourceFile.fileName),
+        workspaceUri,
+        startLine: line,
+        endLine: line,
+        message: typeof diagnostic.messageText === 'string' ? diagnostic.messageText : diagnostic.messageText.messageText,
+        size: diagnostic.length ?? 0,
+        type: 'dead' as const,
+    };
+};
 
 export const findUnusedImports = (
     program: ts.Program,
     sourceFiles: readonly ts.SourceFile[],
     workspaceUri: string,
     toRelativePath: (abs: string) => string,
-): Smell[] => {
-    const results: Smell[] = [];
-
-    for (const sourceFile of sourceFiles) {
-        if (isInDotFolder(sourceFile.fileName)) { continue; }
-
-        for (const diag of program.getSemanticDiagnostics(sourceFile)) {
-            if (diag.code !== UNUSED_LOCAL || diag.start === undefined) { continue; }
-
-            const node = nodeAtPosition(sourceFile, diag.start);
-            if (!node || !isInsideImport(node)) { continue; }
-
-            const { line } = sourceFile.getLineAndCharacterOfPosition(diag.start);
-            const message = typeof diag.messageText === 'string'
-                ? diag.messageText
-                : diag.messageText.messageText;
-
-            results.push({
-                file: toRelativePath(sourceFile.fileName),
-                workspaceUri,
-                startLine: line + 1,
-                endLine: line + 1,
-                message,
-                size: diag.length ?? 0,
-                type: 'dead' as const,
-            });
-        }
-    }
-
-    return results;
-};
+): Smell[] =>
+    sourceFiles
+        .filter(sourceFile => !isInDotFolder(sourceFile.fileName))
+        .flatMap(sourceFile =>
+            program.getSemanticDiagnostics(sourceFile)
+                .filter(diagnostic => diagnostic.code === UNUSED_LOCAL && diagnostic.start !== undefined)
+                .filter(diagnostic => {
+                    const node = nodeAtPosition(sourceFile, diagnostic.start!);
+                    return node && isInsideImport(node);
+                })
+                .map(diagnostic => toSmell(sourceFile, diagnostic, workspaceUri, toRelativePath)),
+        );

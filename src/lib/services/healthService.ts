@@ -4,7 +4,7 @@ import { findFallowSmells } from "../utils/findFallowSmells";
 import { findLongParamFunctions } from "../utils/findLongParamFunctions";
 import { resolveConfigPathsForRoot } from "../utils/createProgram";
 import { runAnalysisWorker } from "../utils/runAnalysisWorker";
-import { tryAsync } from "../utils/asyncResult";
+import { tryAsync } from "../utils/helpers";
 
 export interface HealthApi {
   readonly internalSize: () => Promise<AsyncResult<BundleInfo>>;

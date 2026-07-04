@@ -31,3 +31,20 @@ export interface BundleInfo {
 	nodes: ModuleNode[];
 	total: BundleSize;
 }
+
+export interface OxlintOutput {
+	diagnostics: {
+		message: string;
+		code: string;
+		filename: string;
+		labels: Array<{
+			label: string; 
+			span: {
+				offset: number;
+				length: number;
+				line: number;
+				column: number;
+			} 
+		}>;
+	}[];
+}
