@@ -4,7 +4,7 @@ import { AsyncResult, ModuleNode, Report } from "../../types";
 import { findFallowSmells } from "../utils/findFallowSmells";
 import { findLongParamFunctions } from "../utils/findLongParamFunctions";
 import { resolveConfigPaths } from "../utils/createProgram";
-import { runAnalysisWorker } from "../utils/runAnalysisWorker";
+import { runAnalysis } from "../utils/runAnalysis";
 import { tryAsync } from "../utils/helpers";
 
 export interface HealthApi {
@@ -22,19 +22,19 @@ const generateReport = async (folder: vscode.WorkspaceFolder): Promise<Report> =
     // same directory (e.g. composite tsconfig.json with all file refs in the same dir)
     const uniqueRoots = [...new Set(configPaths.map(p => path.dirname(p)))];
 
-    const [fallowResults, longParamResults, ...workerResults] = await Promise.all([
+    const [fallowResults, longParamResults, ...analysisResult] = await Promise.all([
         Promise.all(uniqueRoots.map(rootPath => findFallowSmells(rootPath, workspaceUri))),
         Promise.all(uniqueRoots.map(rootPath => findLongParamFunctions(rootPath, workspaceUri))),
         ...configPaths.map(configPath =>
-            runAnalysisWorker(configPath, path.dirname(configPath), workspaceUri, ['bundle', 'smells'])
+            runAnalysis(configPath, path.dirname(configPath), workspaceUri, ['bundle', 'smells'])
         ),
     ]);
 
     const dead = fallowResults.flatMap(r => r.dead);
     const duplicate = fallowResults.flatMap(r => r.duplicate);
     const longParams = longParamResults.flat();
-    const modules = workerResults.flatMap(r => r.modules);
-    const workerSmells = workerResults.flatMap(r => r.smells);
+    const modules = analysisResult.flatMap(r => r.modules);
+    const workerSmells = analysisResult.flatMap(r => r.smells);
 
     return {
         bundle: sumUncompressed(modules),
