@@ -3,6 +3,7 @@
   "displayName": "Code Health",
   "description": "Your ultimate code health visibility tool to help prevent software entropy.",
   "publisher": "kaitlynparsons",
+  "icon": "media/icon.png",
   "author": {
     "name": "Kaitlyn Parsons"
   },

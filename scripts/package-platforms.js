@@ -4,10 +4,11 @@
 // vsce packages with --target. Run from the project root.
 //
 // Usage:
-//   node scripts/package-platforms.js                  # all targets
-//   node scripts/package-platforms.js darwin-arm64     # one target
+//   node scripts/package-platforms.js                          # all targets
+//   node scripts/package-platforms.js darwin-arm64             # one target
+//   node scripts/package-platforms.js --publish                # all targets + publish
+//   node scripts/package-platforms.js darwin-arm64 --publish   # one target + publish
 const { execSync } = require('child_process');
-const fs = require('fs');
 const path = require('path');
 
 const root = path.join(__dirname, '..');
@@ -22,11 +23,16 @@ const platforms = {
   'win32-arm64':  { os: 'win32',   cpu: 'arm64'  },
 };
 
-const targets = process.argv.slice(2).length
-  ? process.argv.slice(2)
+const args = process.argv.slice(2);
+const publish = args.includes('--publish');
+const targets = args.filter(a => a !== '--publish').length
+  ? args.filter(a => a !== '--publish')
   : Object.keys(platforms);
 
 const run = (cmd) => execSync(cmd, { cwd: root, stdio: 'inherit' });
+
+const { version } = require('../package.json');
+const vsixFiles = [];
 
 for (const target of targets) {
   const plat = platforms[target];
@@ -48,11 +54,20 @@ for (const target of targets) {
   run('pnpm run package');
 
   // Package for this specific target
-  run(`vsce package --target ${target}`);
+  const vsix = path.join(root, `code-health-${version}-${target}.vsix`);
+  run(`vsce package --target ${target} --out ${vsix}`);
 
-  console.log(`✓ code-health-0.1.0-${target}.vsix`);
+  console.log(`✓ ${vsix}`);
+  vsixFiles.push(vsix);
 }
 
 // Restore dev setup (reinstall current platform's binaries)
 console.log('\n=== Restoring dev environment ===');
 run('pnpm install');
+
+if (publish) {
+  console.log('\n=== Publishing to Marketplace ===');
+  const packagePaths = vsixFiles.map(f => `--packagePath ${f}`).join(' ');
+  run(`vsce publish ${packagePaths}`);
+  console.log(`✓ Published ${vsixFiles.length} platform package(s)`);
+}
