@@ -1,4 +1,4 @@
-![Code Health Logo](media/icon.svg)
+![Code Health Logo](media/icon.png)
 
 ## Code Health - Prevent Software Entropy
 

@@ -41,7 +41,7 @@
         {
           "id": "code-health-sidebar",
           "title": "Code Health",
-          "icon": "media/icon.svg"
+          "icon": "media/icon.png"
         }
       ]
     },
@@ -51,7 +51,7 @@
           "type": "webview",
           "id": "code-health-sidebar",
           "name": "Code Health",
-          "icon": "media/icon.svg"
+          "icon": "media/icon.png"
         }
       ]
     },
