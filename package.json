@@ -1,6 +1,6 @@
 {
-  "name": "code-health",
-  "displayName": "Code Health",
+  "name": "CodeHealthJS",
+  "displayName": "codehealth.js",
   "description": "Your ultimate code health visibility tool to help prevent software entropy.",
   "publisher": "kaitlynparsons",
   "icon": "media/icon.png",
