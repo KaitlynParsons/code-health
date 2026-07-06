@@ -8,18 +8,15 @@ importers:
 
   .:
     dependencies:
+      esbuild:
+        specifier: ^0.28.1
+        version: 0.28.1
       fallow:
         specifier: ^2.103.0
         version: 2.103.0
       oxlint:
         specifier: ^1.72.0
         version: 1.72.0
-      react:
-        specifier: ^19.2.7
-        version: 19.2.7
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
     devDependencies:
       '@types/mocha':
         specifier: ^10.0.10
@@ -42,15 +39,18 @@ importers:
       '@vscode/test-electron':
         specifier: ^3.0.0
         version: 3.0.0
-      esbuild:
-        specifier: ^0.28.1
-        version: 0.28.1
       eslint:
         specifier: ^10.5.0
         version: 10.5.0
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
+      react:
+        specifier: ^19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.7
+        version: 19.2.7(react@19.2.7)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3

@@ -2,6 +2,13 @@
 .vscode-test/**
 out/**
 node_modules/**
+!node_modules/esbuild/**
+!node_modules/@esbuild/darwin-arm64/**
+!node_modules/fallow/**
+!node_modules/detect-libc/**
+!node_modules/@fallow-cli/darwin-arm64/**
+!node_modules/oxlint/**
+!node_modules/@oxlint/binding-darwin-arm64/**
 src/**
 .gitignore
 .yarnrc

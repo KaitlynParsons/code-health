@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import type { AsyncResult, Smell, SmellMap } from '../../types';
 
 const smellTypeLabel: Record<string, string> = {
