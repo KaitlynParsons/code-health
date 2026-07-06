@@ -2,8 +2,16 @@
 
 All notable changes to the "code-health" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.1.0]
 
-## [Unreleased]
+Initial release of Code Health.
 
-- Initial release
+### Features
+- Health bar showing overall codebase health score
+- Drill-down view of smells grouped by type and file
+
+### Detected Code Smells
+- **Dead code** — unused exports and unresolved imports
+- **Duplicate code** — identical or near-identical blocks duplicated across files
+- **Long parameter lists** — functions exceeding the maximum parameter count
+- **Barrel files** — index files that only re-export from other modules
