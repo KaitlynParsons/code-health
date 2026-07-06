@@ -32,3 +32,7 @@ Install Code Health by clicking install on the banner above, or from the extensi
 | **Barrel files** | Index files that only re-export from other modules, degrading build performance and tree-shaking | TypeScript AST |
 
 _Note: Some results may be false positives. Use your judgement before acting._
+
+## Issue Reporting and Feature Requests
+
+Found a bug? Have a feature request? Reach out on our [GitHub Issues page](https://github.com/KaitlynParsons/code-health/issues).
