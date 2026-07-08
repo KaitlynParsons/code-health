@@ -1,2 +1,12 @@
 allowBuilds:
   esbuild: true
+supportedArchitectures:
+  os:
+    - darwin
+    - linux
+    - win32
+    - current
+  cpu:
+    - x64
+    - arm64
+    - current

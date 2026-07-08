@@ -47,12 +47,7 @@ for (const target of targets) {
 
   console.log(`\n=== Building ${target} ===`);
 
-  // Install only this platform's optional binaries
-  run(
-    `pnpm install ` +
-    `--config.supportedArchitectures.os='["${platform.os}","current"]' ` +
-    `--config.supportedArchitectures.cpu='["${platform.cpu}","current"]'`
-  );
+  run('pnpm install');
 
   // Package for this specific target
   const vsix = path.join(root, `code-health-${version}-${target}.vsix`);
