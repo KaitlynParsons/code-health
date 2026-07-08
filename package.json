@@ -13,6 +13,7 @@
   },
   "license": "MIT",
   "version": "0.2.0",
+  "packageManager": "pnpm@10.34.4",
   "engines": {
     "vscode": "^1.125.0"
   },
