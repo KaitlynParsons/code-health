@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.3.0](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.4...CodeHealthJS-v0.3.0) (2026-07-08)
+
+
+### Features
+
+* add separate marketplace and activity bar icons ([2c77c13](https://github.com/KaitlynParsons/code-health/commit/2c77c13fcf9e16955634e74ce33f6f0f20b6c48a))
+
 ## [0.2.4](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.3...CodeHealthJS-v0.2.4) (2026-07-08)
 
 
