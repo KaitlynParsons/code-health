@@ -59,14 +59,11 @@
     "commands": []
   },
   "scripts": {
-    "postinstall": "node scripts/strip-bundled-dev-deps.js",
-    "package-platforms": "node scripts/package-platforms.js",
-    "vscode:prepublish": "pnpm run package",
+    "vscode:prepublish": "node esbuild.js --production",
     "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "pnpm run check-types && pnpm run lint && node esbuild.js --production && node scripts/flatten-for-vsce.js",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
