@@ -64,6 +64,7 @@
         "codehealth": {
           "type": "object",
           "default": {},
+          "description": "Configure Code Health analysis settings.",
           "properties": {
             "entry": {
               "type": "array",

@@ -33,6 +33,12 @@ Install Code Health by clicking install on the banner above, or from the extensi
 
 _Note: Some results may be false positives. Use your judgement before acting._
 
+## Configuration
+
+| Setting | Type | Default | Description |
+|---|---|---|---|
+| `codehealth.entry` | `string[]` | `[]` | Entry point file paths (glob patterns) passed to fallow for dead code analysis. Exports in these files are treated as used, so fallow won't report them as unused. |
+
 ## Issue Reporting and Feature Requests
 
 Found a bug? Have a feature request? Reach out on our [GitHub Issues page](https://github.com/KaitlynParsons/code-health/issues).
