@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.2.3](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.2...CodeHealthJS-v0.2.3) (2026-07-08)
+
+
+### Bug Fixes
+
+* bundle platform-specific binaries as direct optional dependencies ([4167a03](https://github.com/KaitlynParsons/code-health/commit/4167a03283f3e3627e63590bceb46f58bf9e4e59))
+
 ## [0.2.2](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.1...CodeHealthJS-v0.2.2) (2026-07-08)
 
 
