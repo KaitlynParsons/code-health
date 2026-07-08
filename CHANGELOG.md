@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.2.2](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.1...CodeHealthJS-v0.2.2) (2026-07-08)
+
+
+### Bug Fixes
+
+* bundle platform-specific binaries for esbuild, fallow, and oxlint ([5e6b8fc](https://github.com/KaitlynParsons/code-health/commit/5e6b8fc55f3fe8e48e34c2939db4ef96bf505bc6))
+
 ## [0.2.1](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.0...CodeHealthJS-v0.2.1) (2026-07-08)
 
 
