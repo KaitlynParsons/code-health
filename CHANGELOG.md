@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.2.4](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.3...CodeHealthJS-v0.2.4) (2026-07-08)
+
+
+### Bug Fixes
+
+* use pnpm-workspace.yaml to install platform binaries for all targets ([c47f294](https://github.com/KaitlynParsons/code-health/commit/c47f294860406f828976a41bb9d3aac0606f4c6a))
+
 ## [0.2.3](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.2...CodeHealthJS-v0.2.3) (2026-07-08)
 
 
