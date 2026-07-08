@@ -13,5 +13,8 @@
     "npm.packageManager": "pnpm",
     "terminal.integrated.env.osx": {
         "PATH": "/Users/kaitlyn/development/.devbox/nix/profile/default/bin:/Users/kaitlyn/development/.devbox/virtenv/nodejs/corepack-bin:${env:PATH}"
+    },
+    "codehealth": {
+        "entry": ["src/App.tsx"]
     }
-}
+} 

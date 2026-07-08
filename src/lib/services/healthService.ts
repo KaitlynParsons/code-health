@@ -14,7 +14,7 @@ export interface HealthApi {
 const sumUncompressed = (nodes: ModuleNode[]): ModuleNode["uncompressed"] =>
     nodes.reduce((sum, { uncompressed }) => sum + uncompressed, 0);
 
-const generateReport = async (folder: vscode.WorkspaceFolder): Promise<Report> => {
+const generateReport = async (folder: vscode.WorkspaceFolder, entry: string[]): Promise<Report> => {
     const configPaths = resolveConfigPaths(folder.uri.fsPath);
     const workspaceUri = folder.uri.toString();
 
@@ -23,7 +23,7 @@ const generateReport = async (folder: vscode.WorkspaceFolder): Promise<Report> =
     const uniqueRoots = [...new Set(configPaths.map(p => path.dirname(p)))];
 
     const [fallowResults, longParamResults, ...analysisResult] = await Promise.all([
-        Promise.all(uniqueRoots.map(rootPath => findFallowSmells(rootPath, workspaceUri))),
+        Promise.all(uniqueRoots.map(rootPath => findFallowSmells(rootPath, workspaceUri, entry))),
         Promise.all(uniqueRoots.map(rootPath => findLongParamFunctions(rootPath, workspaceUri))),
         ...configPaths.map(configPath =>
             runAnalysis(configPath, path.dirname(configPath), workspaceUri, ['bundle', 'smells'])
@@ -49,7 +49,8 @@ const generateReport = async (folder: vscode.WorkspaceFolder): Promise<Report> =
 
 export const createHealthApi = (getFolders: () => readonly vscode.WorkspaceFolder[] | undefined): HealthApi => ({
     generateReport: () => tryAsync(async () => {
-        const reports = await Promise.all((getFolders() ?? []).map(generateReport));
+        const entry: string[] = vscode.workspace.getConfiguration().get<{ entry?: string[] }>('codehealth')?.entry ?? [];
+        const reports = await Promise.all((getFolders() ?? []).map(folder => generateReport(folder, entry)));
         return reports.reduce<Report>(
             (acc, { bundle, smells }) => ({
                 bundle: (acc.bundle + bundle),

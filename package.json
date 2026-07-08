@@ -56,7 +56,26 @@
         }
       ]
     },
-    "commands": []
+    "commands": [],
+    "configuration": {
+      "title": "Code Health",
+      "properties": {
+        "codehealth": {
+          "type": "object",
+          "default": {},
+          "properties": {
+            "entry": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "Entry point file paths (glob patterns) passed to fallow for dead code analysis. Exports in these files are treated as used, so fallow won't report them as unused."
+            }
+          }
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "node esbuild.js --production",

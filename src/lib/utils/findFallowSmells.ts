@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
+import * as os from 'os';
 
 import type { Smell } from '../../types';
 import { tryParseJson, spawnTool } from './helpers';
@@ -63,15 +65,29 @@ const parseDuplicates = (stdout: string, rootPath: string, workspaceUri: string)
         }] : [],
     );
 
-export const findFallowSmells = async (rootPath: string, workspaceUri: string): Promise<{ dead: Smell[]; duplicate: Smell[] }> => {
-    const args = ['--format', 'json', '--quiet', '--no-cache', '-r', rootPath];
-    const [deadStdout, dupesStdout] = await Promise.all([
-        spawnTool('fallow', ['dead-code', ...args]),
-        spawnTool('fallow', ['dupes', ...args]),
-    ]);
+export const findFallowSmells = async (rootPath: string, workspaceUri: string, entry: string[]): Promise<{ dead: Smell[]; duplicate: Smell[] }> => {
+    const baseArgs = ['--format', 'json', '--quiet', '--no-cache', '-r', rootPath];
 
-    return {
-        dead: parseDeadCode(deadStdout, rootPath, workspaceUri),
-        duplicate: parseDuplicates(dupesStdout, rootPath, workspaceUri),
-    };
+    let configPath: string | undefined;
+    if (entry.length > 0) {
+        configPath = path.join(os.tmpdir(), `codehealth-fallow-${Date.now()}.json`);
+        fs.writeFileSync(configPath, JSON.stringify({ entry }), 'utf8');
+    }
+
+    try {
+        const args = configPath ? ['-c', configPath, ...baseArgs] : baseArgs;
+        const [deadStdout, dupesStdout] = await Promise.all([
+            spawnTool('fallow', ['dead-code', ...args]),
+            spawnTool('fallow', ['dupes', ...args]),
+        ]);
+
+        return {
+            dead: parseDeadCode(deadStdout, rootPath, workspaceUri),
+            duplicate: parseDuplicates(dupesStdout, rootPath, workspaceUri),
+        };
+    } finally {
+        if (configPath) {
+            fs.unlinkSync(configPath);
+        }
+    }
 };
