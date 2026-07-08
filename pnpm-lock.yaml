@@ -57,61 +57,6 @@ importers:
       typescript-eslint:
         specifier: ^8.61.1
         version: 8.62.0(eslint@10.5.0)(typescript@6.0.3)
-    optionalDependencies:
-      '@esbuild/darwin-arm64':
-        specifier: ^0.28.1
-        version: 0.28.1
-      '@esbuild/darwin-x64':
-        specifier: ^0.28.1
-        version: 0.28.1
-      '@esbuild/linux-arm64':
-        specifier: ^0.28.1
-        version: 0.28.1
-      '@esbuild/linux-x64':
-        specifier: ^0.28.1
-        version: 0.28.1
-      '@esbuild/win32-arm64':
-        specifier: ^0.28.1
-        version: 0.28.1
-      '@esbuild/win32-x64':
-        specifier: ^0.28.1
-        version: 0.28.1
-      '@fallow-cli/darwin-arm64':
-        specifier: ^2.103.0
-        version: 2.103.0
-      '@fallow-cli/darwin-x64':
-        specifier: ^2.103.0
-        version: 2.103.0
-      '@fallow-cli/linux-arm64-gnu':
-        specifier: ^2.103.0
-        version: 2.103.0
-      '@fallow-cli/linux-x64-gnu':
-        specifier: ^2.103.0
-        version: 2.103.0
-      '@fallow-cli/win32-arm64-msvc':
-        specifier: ^2.103.0
-        version: 2.103.0
-      '@fallow-cli/win32-x64-msvc':
-        specifier: ^2.103.0
-        version: 2.103.0
-      '@oxlint/binding-darwin-arm64':
-        specifier: ^1.72.0
-        version: 1.72.0
-      '@oxlint/binding-darwin-x64':
-        specifier: ^1.72.0
-        version: 1.72.0
-      '@oxlint/binding-linux-arm64-gnu':
-        specifier: ^1.72.0
-        version: 1.72.0
-      '@oxlint/binding-linux-x64-gnu':
-        specifier: ^1.72.0
-        version: 1.72.0
-      '@oxlint/binding-win32-arm64-msvc':
-        specifier: ^1.72.0
-        version: 1.72.0
-      '@oxlint/binding-win32-x64-msvc':
-        specifier: ^1.72.0
-        version: 1.72.0
 
 packages:
 
