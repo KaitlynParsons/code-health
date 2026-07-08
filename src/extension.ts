@@ -15,7 +15,7 @@ class CodeHealthViewProvider implements vscode.WebviewViewProvider {
 		};
 
 		const scriptUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'index.js'));
-		const iconUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'icon.png'));
+		const iconUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'activitybar-icon.png'));
 		const stylesheetUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(mediaUri, 'index.css'));
 		const htmlPath = path.join(this.extensionUri.fsPath, 'media', 'index.html');
 		webviewView.webview.html = fs.readFileSync(htmlPath, 'utf8')

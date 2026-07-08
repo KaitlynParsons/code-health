@@ -3,7 +3,7 @@
   "displayName": "codehealth.js",
   "description": "Your ultimate code health visibility tool to help prevent software entropy.",
   "publisher": "kaitlynparsons",
-  "icon": "media/icon.png",
+  "icon": "media/mp-icon.png",
   "author": {
     "name": "Kaitlyn Parsons"
   },
@@ -43,7 +43,7 @@
         {
           "id": "code-health-sidebar",
           "title": "Code Health",
-          "icon": "media/icon.png"
+          "icon": "media/activitybar-icon.png"
         }
       ]
     },
@@ -53,7 +53,7 @@
           "type": "webview",
           "id": "code-health-sidebar",
           "name": "Code Health",
-          "icon": "media/icon.png"
+          "icon": "media/activitybar-icon.png"
         }
       ]
     },
