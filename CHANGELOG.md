@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.2.1](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.0...CodeHealthJS-v0.2.1) (2026-07-08)
+
+
+### Bug Fixes
+
+* resolve esbuild binary not found error ([dccd4cd](https://github.com/KaitlynParsons/code-health/commit/dccd4cd09864b66fedd2bd6beba45312377b3c02))
+
 ## [0.2.0](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.1.0...CodeHealthJS-v0.2.0) (2026-07-08)
 
 
