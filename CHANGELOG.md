@@ -14,11 +14,11 @@ All notable changes to the "codehealth.js" extension will be documented in this 
 Initial release of Code Health.
 
 ### Features
-- Health bar showing overall codebase health score
-- Drill-down view of smells grouped by type and file
+* Health bar showing overall codebase health score
+* Drill-down view of smells grouped by type and file
 
 ### Detected Code Smells
-- **Dead code** — unused exports and unresolved imports
-- **Duplicate code** — identical or near-identical blocks duplicated across files
-- **Long parameter lists** — functions exceeding the maximum parameter count
-- **Barrel files** — index files that only re-export from other modules
+* **Dead code** — unused exports and unresolved imports
+* **Duplicate code** — identical or near-identical blocks duplicated across files
+* **Long parameter lists** — functions exceeding the maximum parameter count
+* **Barrel files** — index files that only re-export from other modules
