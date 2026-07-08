@@ -34,6 +34,10 @@ const run = (cmd) => execSync(cmd, { cwd: root, stdio: 'inherit' });
 const { version } = require('../package.json');
 const vsixFiles = [];
 
+// Run type-check and lint once before the per-platform loop
+console.log('\n=== Pre-flight checks ===');
+run('pnpm run check-types && pnpm run lint');
+
 for (const target of targets) {
   const plat = platforms[target];
   if (!plat) {
@@ -50,8 +54,8 @@ for (const target of targets) {
     `--config.supportedArchitectures.cpu='["${plat.cpu}","current"]'`
   );
 
-  // Build (check-types, lint, esbuild, flatten-for-vsce)
-  run('pnpm run package');
+  // Build (esbuild, flatten-for-vsce) — checks already ran once above
+  run('node esbuild.js --production && node scripts/flatten-for-vsce.js');
 
   // Package for this specific target
   const vsix = path.join(root, `code-health-${version}-${target}.vsix`);
@@ -62,8 +66,11 @@ for (const target of targets) {
 }
 
 // Restore dev setup (reinstall current platform's binaries)
-console.log('\n=== Restoring dev environment ===');
-run('pnpm install');
+// Skip in CI — runners are ephemeral
+if (!process.env.CI) {
+  console.log('\n=== Restoring dev environment ===');
+  run('pnpm install');
+}
 
 if (publish) {
   console.log('\n=== Publishing to Marketplace ===');

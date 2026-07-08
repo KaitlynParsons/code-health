@@ -2,7 +2,7 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
-## [0.1.0] - 2026-07-06
+## 0.1.0 (2026-07-06)
 
 Initial release of Code Health.
 
