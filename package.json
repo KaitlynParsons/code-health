@@ -138,5 +138,25 @@
     "esbuild": "^0.28.1",
     "fallow": "^2.103.0",
     "oxlint": "^1.72.0"
+  },
+  "optionalDependencies": {
+    "@esbuild/darwin-arm64": "^0.28.1",
+    "@esbuild/darwin-x64": "^0.28.1",
+    "@esbuild/linux-x64": "^0.28.1",
+    "@esbuild/linux-arm64": "^0.28.1",
+    "@esbuild/win32-x64": "^0.28.1",
+    "@esbuild/win32-arm64": "^0.28.1",
+    "@fallow-cli/darwin-arm64": "^2.103.0",
+    "@fallow-cli/darwin-x64": "^2.103.0",
+    "@fallow-cli/linux-x64-gnu": "^2.103.0",
+    "@fallow-cli/linux-arm64-gnu": "^2.103.0",
+    "@fallow-cli/win32-x64-msvc": "^2.103.0",
+    "@fallow-cli/win32-arm64-msvc": "^2.103.0",
+    "@oxlint/binding-darwin-arm64": "^1.72.0",
+    "@oxlint/binding-darwin-x64": "^1.72.0",
+    "@oxlint/binding-linux-x64-gnu": "^1.72.0",
+    "@oxlint/binding-linux-arm64-gnu": "^1.72.0",
+    "@oxlint/binding-win32-x64-msvc": "^1.72.0",
+    "@oxlint/binding-win32-arm64-msvc": "^1.72.0"
   }
 }
