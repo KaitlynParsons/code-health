@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.3.1](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.3.0...CodeHealthJS-v0.3.1) (2026-07-13)
+
+
+### Bug Fixes
+
+* show analysis errors once instead of per section ([99d2c37](https://github.com/KaitlynParsons/code-health/commit/99d2c372f4aa5b65e8265b6fb961d10bb1b226e6))
+
 ## [0.3.0](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.2.4...CodeHealthJS-v0.3.0) (2026-07-08)
 
 
