@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.3.2](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.3.1...CodeHealthJS-v0.3.2) (2026-07-13)
+
+
+### Bug Fixes
+
+* bundle platform binaries correctly in vsix packages ([bad0ed4](https://github.com/KaitlynParsons/code-health/commit/bad0ed46c419747c9ce30fb05e6c66005e41ffe6))
+
 ## [0.3.1](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.3.0...CodeHealthJS-v0.3.1) (2026-07-13)
 
 
