@@ -3,7 +3,6 @@ name: Release
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -23,7 +22,7 @@ jobs:
 
   publish:
     needs: release-please
-    if: needs.release-please.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch'
+    if: needs.release-please.outputs.release_created == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,4 +40,6 @@ jobs:
 
       - run: node scripts/package-platforms.js --publish
         env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}

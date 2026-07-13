@@ -34,9 +34,9 @@ const run = (cmd) => execSync(cmd, { cwd: root, stdio: 'inherit' });
 const { version } = require('../package.json');
 const vsixFiles = [];
 
-// Run type-check and lint once before the per-platform loop
+// Run type-check, lint, and install once before the per-platform loop
 console.log('\n=== Pre-flight checks ===');
-run('pnpm run check-types && pnpm run lint');
+run('pnpm run check-types && pnpm run lint && pnpm install');
 
 for (const target of targets) {
   const platform = platforms[target];
@@ -46,8 +46,6 @@ for (const target of targets) {
   }
 
   console.log(`\n=== Building ${target} ===`);
-
-  run('pnpm install');
 
   // Package for this specific target
   const vsix = path.join(root, `code-health-${version}-${target}.vsix`);
@@ -60,6 +58,6 @@ for (const target of targets) {
 if (publish) {
   console.log('\n=== Publishing to Marketplace ===');
   const packagePaths = vsixFiles.map(f => `--packagePath ${f}`).join(' ');
-  run(`vsce publish ${packagePaths}`);
+  run(`vsce publish --azure-credential ${packagePaths}`);
   console.log(`✓ Published ${vsixFiles.length} platform package(s)`);
 }
