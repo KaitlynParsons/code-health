@@ -1,7 +1,14 @@
 import * as path from 'path';
 import ts from 'typescript';
 
-export const createProgramFromConfig = (configPath: string): ts.Program => {
+interface ProgramContext {
+    program: ts.Program;
+    sourceFiles: ts.SourceFile[];
+    experimentalDecorators: boolean | undefined;
+    toRelativePath: (abs: string) => string;
+}
+
+const createProgramFromConfig = (configPath: string): ts.Program => {
 	const raw = ts.readConfigFile(configPath, ts.sys.readFile);
 	const parsed = ts.parseJsonConfigFileContent(raw.config, ts.sys, path.dirname(configPath));
 	return ts.createProgram(parsed.fileNames, {
@@ -11,6 +18,16 @@ export const createProgramFromConfig = (configPath: string): ts.Program => {
 		noUnusedLocals: true,
 		noUnusedParameters: true,
 	});
+};
+
+export const buildProgramContext = (configPath: string, rootPath: string): ProgramContext => {
+    const program = createProgramFromConfig(configPath);
+    const sourceFiles = program.getSourceFiles().filter(
+        f => !f.isDeclarationFile && !program.isSourceFileFromExternalLibrary(f)
+    );
+    const { experimentalDecorators } = program.getCompilerOptions();
+    const toRelativePath = (abs: string) => path.relative(rootPath, abs);
+    return { program, sourceFiles, experimentalDecorators, toRelativePath };
 };
 
 export const resolveConfigPaths = (rootPath: string): string[] => {

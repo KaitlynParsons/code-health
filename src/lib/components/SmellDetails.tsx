@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import type { AsyncResult, Smell, SmellMap } from '../../types';
+import type { Loadable, Smell, SmellMap } from '../../types';
 
 const smellTypeLabel: Record<string, string> = {
 	dead: 'Dead Code',
@@ -65,7 +65,7 @@ const SmellGroup = ({ type, items, postMessage }: { type: string; items: Smell[]
 	);
 };
 
-export const SmellDetails = ({ smells, postMessage }: { smells: AsyncResult<SmellMap>, postMessage: (msg: unknown) => void }) => {
+export const SmellDetails = ({ smells, postMessage }: { smells: Loadable<SmellMap>, postMessage: (msg: unknown) => void }) => {
 	if (smells.state === 'loading') {
 		return (
 			<Container>
@@ -73,22 +73,6 @@ export const SmellDetails = ({ smells, postMessage }: { smells: AsyncResult<Smel
 				<SkeletonGroup />
 				<SkeletonGroup />
 				<SkeletonGroup />
-			</Container>
-		);
-	}
-
-	if (smells.state === 'error') {
-		return (
-			<Container>
-				<div className="error">
-					<p>Failed to compute smells.</p>
-					{typeof smells.error === 'string' && <p><code>{smells.error}</code></p>}
-					<p>Common causes:</p>
-					<ul>
-						<li>A source file has a syntax error the TypeScript compiler cannot recover from</li>
-						<li><code>tsconfig.json</code> or <code>jsconfig.json</code> is malformed or unreadable</li>
-					</ul>
-				</div>
 			</Container>
 		);
 	}

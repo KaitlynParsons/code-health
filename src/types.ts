@@ -1,10 +1,13 @@
 type SmellType = "dead" | "duplicate" | "longParams" | "barrel";
 type File = string;
 
-export type AsyncResult<T> =
+export type Loadable<T> =
     | { state: "loading" }
-    | { state: "error"; error: unknown }
     | { state: "success"; data: T };
+
+export type AsyncResult<T> =
+    | Loadable<T>
+    | { state: "error"; error: unknown };
 
 export interface Smell {
 	file: File;

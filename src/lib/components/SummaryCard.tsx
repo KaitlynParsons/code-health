@@ -1,8 +1,8 @@
-import type { AsyncResult, ModuleNode, SmellMap } from '../../types';
+import type { Loadable, ModuleNode, SmellMap } from '../../types';
 
 interface Props {
-    bundle: AsyncResult<ModuleNode["uncompressed"]>;
-    smells: AsyncResult<SmellMap>;
+    bundle: Loadable<ModuleNode["uncompressed"]>;
+    smells: Loadable<SmellMap>;
 }
 
 function formatBytes(bytes: number): string {
@@ -29,20 +29,6 @@ export const SummaryCard = ({ bundle, smells }: Props) => {
                     <span className="skeleton skeleton--text" />
                 </div>
             </>
-        );
-    }
-
-    if (bundle.state === 'error' || smells.state === "error") {
-        return (
-            <div className="error">
-                <p>Failed to compute.</p>
-                {bundle.state === 'error' && typeof bundle.error === 'string' && <p><code>{bundle.error}</code></p>}
-                <p>Common causes:</p>
-                <ul>
-                    <li>A source file has a syntax error esbuild cannot parse — fix the file shown above</li>
-                    <li><code>tsconfig.json</code> or <code>jsconfig.json</code> is malformed or unreadable</li>
-                </ul>
-            </div>
         );
     }
 

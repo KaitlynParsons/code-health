@@ -26,7 +26,11 @@ export const trampoline = <A extends unknown[], T>(
     fn: (...args: A) => Step<T>,
 ) => (...args: A): T => {
     let current: Step<T> = fn(...args);
-    while (typeof current === 'function') { current = (current as () => Step<T>)(); }
+
+    while (typeof current === 'function') { 
+		current = (current as () => Step<T>)(); 
+	}
+
     return current as T;
 };
 

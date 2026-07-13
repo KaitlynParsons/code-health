@@ -21777,22 +21777,6 @@
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SkeletonGroup, {})
       ] });
     }
-    if (smells.state === "error") {
-      return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Container, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "error", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Failed to compute smells." }),
-        typeof smells.error === "string" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("code", { children: smells.error }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Common causes:" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "A source file has a syntax error the TypeScript compiler cannot recover from" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("code", { children: "tsconfig.json" }),
-            " or ",
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("code", { children: "jsconfig.json" }),
-            " is malformed or unreadable"
-          ] })
-        ] })
-      ] }) });
-    }
     return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Container, { children: [
       Object.entries(smells.data).map(([type, items]) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SmellGroup, { type, items, postMessage }, type)),
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "note", children: "Some results may be false positives." })
@@ -21817,22 +21801,6 @@
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "health-bar", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "health-bar__fill skeleton", style: { width: "100%" } }) }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "skeleton skeleton--text", style: { width: "70%", marginTop: "8px", display: "block" } }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "row", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "skeleton skeleton--text" }) })
-      ] });
-    }
-    if (bundle.state === "error" || smells.state === "error") {
-      return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "error", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "Failed to compute." }),
-        bundle.state === "error" && typeof bundle.error === "string" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("code", { children: bundle.error }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "Common causes:" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("ul", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("li", { children: "A source file has a syntax error esbuild cannot parse \u2014 fix the file shown above" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("li", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("code", { children: "tsconfig.json" }),
-            " or ",
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("code", { children: "jsconfig.json" }),
-            " is malformed or unreadable"
-          ] })
-        ] })
       ] });
     }
     const totalBytes = bundle.data;
@@ -21861,7 +21829,7 @@
   var import_jsx_runtime3 = __toESM(require_jsx_runtime());
   var LOADING = { state: "loading" };
   var App = ({ postMessage }) => {
-    const [report, setReport] = (0, import_react.useState)(null);
+    const [report, setReport] = (0, import_react.useState)(LOADING);
     (0, import_react.useEffect)(() => {
       const handler = (event) => {
         const { type, data } = event.data;
@@ -21873,6 +21841,30 @@
       postMessage({ type: "ready" });
       return () => window.removeEventListener("message", handler);
     }, []);
+    if (report.state === "error") {
+      return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "row", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h1", { children: "Report" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => postMessage({ type: "ready" }), "aria-label": "Refresh", children: "Refresh" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "error", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "Failed to compute." }),
+          typeof report.error === "string" && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("code", { children: report.error }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "Common causes:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("ul", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("li", { children: "A source file has a syntax error \u2014 fix the file shown above" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("li", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("code", { children: "tsconfig.json" }),
+              " or ",
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("code", { children: "jsconfig.json" }),
+              " is malformed or unreadable"
+            ] })
+          ] })
+        ] })
+      ] });
+    }
+    const bundle = report.state === "success" ? { state: "success", data: report.data.bundle } : LOADING;
+    const smells = report.state === "success" ? { state: "success", data: report.data.smells } : LOADING;
     return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "row", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h1", { children: "Report" }),
@@ -21880,9 +21872,9 @@
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "section", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { children: "Summary" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SummaryCard, { bundle: report?.bundle ?? LOADING, smells: report?.smells ?? LOADING })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SummaryCard, { bundle, smells })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SmellDetails, { smells: report?.smells ?? LOADING, postMessage })
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SmellDetails, { smells, postMessage })
     ] });
   };
 

@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { AsyncResult, ModuleNode, Report } from "../../types";
+import { AsyncResult, ModuleNode, Report, Smell } from "../../types";
 import { findFallowSmells } from "../utils/findFallowSmells";
 import { findLongParamFunctions } from "../utils/findLongParamFunctions";
-import { resolveConfigPaths } from "../utils/createProgram";
-import { runAnalysis } from "../utils/runAnalysis";
-import { tryAsync } from "../utils/helpers";
+import { buildProgramContext, resolveConfigPaths } from "../utils/createProgram";
+import { getBundleModules } from "../utils/getBundleModules";
+import { findUnusedImports } from "../utils/findUnusedImports";
+import { findBarrelFiles } from "../utils/findBarrelFiles";
+import { isInDotFolder, tryAsync } from "../utils/helpers";
 
 export interface HealthApi {
   readonly generateReport: () => Promise<AsyncResult<Report>>;
@@ -18,31 +20,40 @@ const generateReport = async (folder: vscode.WorkspaceFolder, entry: string[]): 
     const configPaths = resolveConfigPaths(folder.uri.fsPath);
     const workspaceUri = folder.uri.toString();
 
-    // Deduplicate root directories so fallow/longParams don't run multiple times on the
-    // same directory (e.g. composite tsconfig.json with all file refs in the same dir)
-    const uniqueRoots = [...new Set(configPaths.map(p => path.dirname(p)))];
-
-    const [fallowResults, longParamResults, ...analysisResult] = await Promise.all([
-        Promise.all(uniqueRoots.map(rootPath => findFallowSmells(rootPath, workspaceUri, entry))),
-        Promise.all(uniqueRoots.map(rootPath => findLongParamFunctions(rootPath, workspaceUri))),
-        ...configPaths.map(configPath =>
-            runAnalysis(configPath, path.dirname(configPath), workspaceUri, ['bundle', 'smells'])
-        ),
+    // Deduplicate root dirs so fallow/longParams don't run multiple times on the same
+    // directory (e.g. composite tsconfig.json with all file refs in the same dir)
+    const roots = [...new Set(configPaths.map(p => path.dirname(p)))];
+    const [fallowResults, longParamResults] = await Promise.all([
+        Promise.all(roots.map(rootPath => findFallowSmells(rootPath, workspaceUri, entry))),
+        Promise.all(roots.map(rootPath => findLongParamFunctions(rootPath, workspaceUri))),
     ]);
+
+    const analysisResult: { unusedImports: Smell[]; barrelFiles: Smell[]; modules: ModuleNode[] }[] = [];
+    for (const configPath of configPaths) {
+        const ctx = buildProgramContext(configPath, path.dirname(configPath));
+        const filtered = ctx.sourceFiles.filter(f => !isInDotFolder(f.fileName));
+        const [unusedImports, barrelFiles, modules] = await Promise.all([
+            findUnusedImports(ctx.program, filtered, workspaceUri, ctx.toRelativePath),
+            findBarrelFiles(filtered, workspaceUri, ctx.toRelativePath),
+            getBundleModules(ctx.sourceFiles, ctx.experimentalDecorators, ctx.toRelativePath),
+        ]);
+        analysisResult.push({ unusedImports, barrelFiles, modules });
+    }
 
     const dead = fallowResults.flatMap(r => r.dead);
     const duplicate = fallowResults.flatMap(r => r.duplicate);
     const longParams = longParamResults.flat();
     const modules = analysisResult.flatMap(r => r.modules);
-    const workerSmells = analysisResult.flatMap(r => r.smells);
+    const unusedImports = analysisResult.flatMap(r => r.unusedImports);
+    const barrelFiles = analysisResult.flatMap(r => r.barrelFiles);
 
     return {
         bundle: sumUncompressed(modules),
         smells: {
-            dead: [...dead, ...workerSmells.filter(s => s.type === 'dead')],
+            dead: [...dead, ...unusedImports],
             duplicate,
             longParams,
-            barrel: workerSmells.filter(s => s.type === 'barrel'),
+            barrel: barrelFiles,
         },
     };
 };
