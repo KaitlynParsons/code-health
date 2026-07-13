@@ -6,11 +6,8 @@
 out/**
 node_modules/**
 !node_modules/esbuild/**
-!node_modules/@esbuild/**
 !node_modules/fallow/**
-!node_modules/@fallow-cli/**
 !node_modules/oxlint/**
-!node_modules/@oxlint/**
 src/**
 .gitignore
 .yarnrc

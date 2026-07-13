@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Builds a platform-specific .vsix for each target (or the ones passed as args).
-// For each target, pnpm installs only that platform's optional binaries, then
-// vsce packages with --target. Run from the project root.
+// For each target, writes a temporary .vscodeignore that includes only that
+// platform's optional binaries, then vsce packages with --target. Run from the
+// project root.
 //
 // Usage:
 //   node scripts/package-platforms.js                          # all targets
@@ -9,26 +10,19 @@
 //   node scripts/package-platforms.js --publish                # all targets + publish
 //   node scripts/package-platforms.js darwin-arm64 --publish   # one target + publish
 const { execSync } = require('child_process');
-const { readdirSync, rmSync, existsSync } = require('fs');
+const { readFileSync, writeFileSync } = require('fs');
 const path = require('path');
-
-// Scopes that ship platform-specific optional binaries
-const binaryScopes = ['@esbuild', '@fallow-cli', '@oxlint'];
 
 const root = path.join(__dirname, '..');
 
-// Host platform — binaries needed for the vscode:prepublish build step
-const hostOs = process.platform;           // 'darwin' | 'linux' | 'win32'
-const hostCpu = process.arch === 'arm64' ? 'arm64' : 'x64';
-
-// vsce target → pnpm supportedArchitectures values + optional binary packages
+// vsce target → exact optional binary packages to include in the VSIX
 const platforms = {
-  'darwin-arm64': { os: 'darwin',  cpu: 'arm64'  },
-  'darwin-x64':   { os: 'darwin',  cpu: 'x64'    },
-  'linux-x64':    { os: 'linux',   cpu: 'x64'    },
-  'linux-arm64':  { os: 'linux',   cpu: 'arm64'  },
-  'win32-x64':    { os: 'win32',   cpu: 'x64'    },
-  'win32-arm64':  { os: 'win32',   cpu: 'arm64'  },
+  'darwin-arm64': { packages: ['@esbuild/darwin-arm64',  '@fallow-cli/darwin-arm64',      '@oxlint/binding-darwin-arm64'     ] },
+  'darwin-x64':   { packages: ['@esbuild/darwin-x64',    '@fallow-cli/darwin-x64',        '@oxlint/binding-darwin-x64'       ] },
+  'linux-x64':    { packages: ['@esbuild/linux-x64',     '@fallow-cli/linux-x64-gnu',     '@oxlint/binding-linux-x64-gnu'    ] },
+  'linux-arm64':  { packages: ['@esbuild/linux-arm64',   '@fallow-cli/linux-arm64-gnu',   '@oxlint/binding-linux-arm64-gnu'  ] },
+  'win32-x64':    { packages: ['@esbuild/win32-x64',     '@fallow-cli/win32-x64-msvc',    '@oxlint/binding-win32-x64-msvc'   ] },
+  'win32-arm64':  { packages: ['@esbuild/win32-arm64',   '@fallow-cli/win32-arm64-msvc',  '@oxlint/binding-win32-arm64-msvc' ] },
 };
 
 const args = process.argv.slice(2);
@@ -40,43 +34,40 @@ const targets = args.filter(a => a !== '--publish').length
 const run = (cmd) => execSync(cmd, { cwd: root, stdio: 'inherit' });
 
 const { version } = require('../package.json');
+
+const vscodeignorePath = path.join(root, '.vscodeignore');
+const originalIgnore = readFileSync(vscodeignorePath, 'utf8');
+
+// Run pre-flight checks and install once before the per-platform loop
+console.log('\n=== Pre-flight checks ===');
+run('pnpm install && pnpm run check-types && pnpm run lint');
+
 const vsixFiles = [];
 
-// Run type-check and lint once before the per-platform loop
-console.log('\n=== Pre-flight checks ===');
-run('pnpm run check-types && pnpm run lint');
-
-for (const target of targets) {
-  const platform = platforms[target];
-  if (!platforms[target]) {
-    console.error(`Unknown target: ${target}. Valid targets: ${Object.keys(platforms).join(', ')}`);
-    process.exit(1);
-  }
-
-  console.log(`\n=== Building ${target} ===`);
-  run('pnpm install');
-
-  // Remove cross-product binaries — keep only the exact target platform
-  for (const scope of binaryScopes) {
-    const scopeDir = path.join(root, 'node_modules', scope);
-    if (!existsSync(scopeDir)) {
-      continue;
+try {
+  for (const target of targets) {
+    if (!platforms[target]) {
+      console.error(`Unknown target: ${target}. Valid targets: ${Object.keys(platforms).join(', ')}`);
+      process.exit(1);
     }
-    for (const pkg of readdirSync(scopeDir)) {
-      const isTarget = pkg.includes(platform.os) && pkg.includes(platform.cpu);
-      const isHost = pkg.includes(hostOs) && pkg.includes(hostCpu);
-      if (!isTarget && !isHost) {
-        rmSync(path.join(scopeDir, pkg), { recursive: true, force: true });
-      }
-    }
+
+    console.log(`\n=== Building ${target} ===`);
+
+    // Write a target-specific .vscodeignore that includes only this platform's binaries
+    const targetIncludes = platforms[target].packages
+      .map(pkg => `!node_modules/${pkg}/**`)
+      .join('\n');
+    writeFileSync(vscodeignorePath, `${originalIgnore.trimEnd()}\n${targetIncludes}\n`);
+
+    const vsix = path.join(root, `code-health-${version}-${target}.vsix`);
+    run(`vsce package --target ${target} --out ${vsix}`);
+
+    console.log(`✓ ${vsix}`);
+    vsixFiles.push(vsix);
   }
-
-  // Package for this specific target
-  const vsix = path.join(root, `code-health-${version}-${target}.vsix`);
-  run(`vsce package --target ${target} --out ${vsix}`);
-
-  console.log(`✓ ${vsix}`);
-  vsixFiles.push(vsix);
+} finally {
+  // Restore .vscodeignore regardless of success or failure
+  writeFileSync(vscodeignorePath, originalIgnore);
 }
 
 if (publish) {
