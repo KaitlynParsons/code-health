@@ -1,34 +1,37 @@
-import { useEffect, useState } from 'react';
+import { ReactNode } from 'react';
 import { SmellDetails } from './lib/components/SmellDetails';
 import { SummaryCard } from './lib/components/SummaryCard';
-import type { AsyncResult, Report } from './types';
+import { useGetAppContext } from './lib/hooks/useAppContext';
+import { Toggle } from './lib/components/Toggle';
 
 const LOADING = { state: "loading" } as const;
 
-export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) => {
-	const [report, setReport] = useState<AsyncResult<Report>>(LOADING);
+const AppContainer = ({ children }: { children: ReactNode }) => {
+	const { gitDiffOnly, postMessage, report } = useGetAppContext();
 
-	useEffect(() => {
-		const handler = (event: MessageEvent) => {
-			const { type, data } = event.data;
-			if (type === 'results') {
-				setReport(data);
-			}
-		};
-		window.addEventListener('message', handler);
-		postMessage({ type: 'ready' });
-		return () => window.removeEventListener('message', handler);
-	}, []);
+	return <>
+		<div className='row'>
+			<h1>Report</h1>
+			<div className='row__actions'>
+				<Toggle />
+				<button onClick={() => {
+					if (report.state === "loading") return;
+					postMessage({ type: 'ready', gitDiffOnly })
+				}} aria-label="Refresh">
+					Refresh
+				</button>
+			</div>
+		</div>
+		{children}
+	</>
+}
+
+export const App = () => {
+	const { report, postMessage } = useGetAppContext();
 
 	if (report.state === 'error') {
 		return (
-			<>
-				<div className='row'>
-					<h1>Report</h1>
-					<button onClick={() => postMessage({ type: 'ready' })} aria-label="Refresh">
-						Refresh
-					</button>
-				</div>
+			<AppContainer>
 				<div className="error">
 					<p>Failed to compute.</p>
 					{typeof report.error === 'string' && <p><code>{report.error}</code></p>}
@@ -38,7 +41,7 @@ export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) =>
 						<li><code>tsconfig.json</code> or <code>jsconfig.json</code> is malformed or unreadable</li>
 					</ul>
 				</div>
-			</>
+			</AppContainer>
 		);
 	}
 
@@ -46,18 +49,12 @@ export const App = ({ postMessage }: { postMessage: (msg: unknown) => void }) =>
 	const smells = report.state === 'success' ? { state: 'success' as const, data: report.data.smells } : LOADING;
 
 	return (
-		<>
-			<div className='row'>
-				<h1>Report</h1>
-				<button onClick={() => postMessage({ type: 'ready' })} aria-label="Refresh">
-					Refresh
-				</button>
-			</div>
+		<AppContainer>
 			<div className='section'>
 				<h2>Summary</h2>
 				<SummaryCard bundle={bundle} smells={smells} />
 			</div>
 			<SmellDetails smells={smells} postMessage={postMessage} />
-		</>
+		</AppContainer>
 	);
 };

@@ -1,5 +1,6 @@
 import ts from 'typescript';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { AsyncResult, Step } from '../../types';
 
@@ -59,6 +60,43 @@ const bins = {
 	oxlint: path.join(__dirname, '..', 'node_modules', 'oxlint', 'bin', 'oxlint'),
 	fallow:  path.join(__dirname, '..', 'node_modules', 'fallow',  'bin', 'fallow'),
 } as const;
+
+const waitForEvent = <T>(subscribe: (callback: (value: T) => void) => vscode.Disposable, until?: (value: T) => boolean, timeoutMs?: number): Promise<T | undefined> =>
+	new Promise(resolve => {
+		const timer = timeoutMs !== undefined ? setTimeout(() => { 
+			disposable.dispose(); 
+			resolve(undefined); 
+		}, timeoutMs) : undefined;
+		const disposable = subscribe(value => {
+			if (!until || until(value)) {
+				clearTimeout(timer);
+				disposable.dispose();
+				resolve(value);
+			}
+		});
+	});
+
+export const getGitDiffPaths = async (): Promise<string[]> => {
+	const extension = vscode.extensions.getExtension('vscode.git');
+	if (!extension) { return []; }
+
+	await extension.activate();
+	const git = extension.exports?.getAPI(1);
+	if (!git) { return []; }
+
+	const repo = git.repositories[0] ?? await waitForEvent<typeof git.repositories[0]>(callback => git.onDidOpenRepository(callback));
+	if (!repo) { return []; }
+
+	const hasChanges = () => repo.state.indexChanges.length > 0 || repo.state.workingTreeChanges.length > 0;
+	if (!hasChanges()) {
+		await waitForEvent<void>(callback => repo.state.onDidChange(callback), hasChanges, 5000);
+	}
+
+	return [...new Set(
+		[...repo.state.indexChanges, ...repo.state.workingTreeChanges]
+			.map((change: { uri: vscode.Uri }) => change.uri.fsPath)
+	)];
+};
 
 export const spawnTool = (tool: keyof typeof bins, args: string[]): Promise<string> =>
 	new Promise((resolve, reject) => {

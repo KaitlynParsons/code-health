@@ -7,16 +7,20 @@ import { buildProgramContext, resolveConfigPaths } from "../utils/createProgram"
 import { getBundleModules } from "../utils/getBundleModules";
 import { findUnusedImports } from "../utils/findUnusedImports";
 import { findBarrelFiles } from "../utils/findBarrelFiles";
-import { isInDotFolder, tryAsync } from "../utils/helpers";
+import { getGitDiffPaths, isInDotFolder, tryAsync } from "../utils/helpers";
 
 export interface HealthApi {
-  readonly generateReport: () => Promise<AsyncResult<Report>>;
+  readonly generateReport: (gitDiffOnly: boolean) => Promise<AsyncResult<Report>>;
+  readonly invalidateCache: () => void;
 }
 
 const sumUncompressed = (nodes: ModuleNode[]): ModuleNode["uncompressed"] =>
     nodes.reduce((sum, { uncompressed }) => sum + uncompressed, 0);
 
-const generateReport = async (folder: vscode.WorkspaceFolder, entry: string[]): Promise<Report> => {
+type CachedResult = { smells: Report["smells"]; modules: ModuleNode[] };
+const cache = new Map<string, CachedResult>();
+
+const computeReport = async (folder: vscode.WorkspaceFolder, entry: string[]): Promise<CachedResult> => {
     const configPaths = resolveConfigPaths(folder.uri.fsPath);
     const workspaceUri = folder.uri.toString();
 
@@ -40,39 +44,52 @@ const generateReport = async (folder: vscode.WorkspaceFolder, entry: string[]): 
         analysisResult.push({ unusedImports, barrelFiles, modules });
     }
 
-    const dead = fallowResults.flatMap(r => r.dead);
-    const duplicate = fallowResults.flatMap(r => r.duplicate);
-    const longParams = longParamResults.flat();
-    const modules = analysisResult.flatMap(r => r.modules);
-    const unusedImports = analysisResult.flatMap(r => r.unusedImports);
-    const barrelFiles = analysisResult.flatMap(r => r.barrelFiles);
-
     return {
-        bundle: sumUncompressed(modules),
         smells: {
-            dead: [...dead, ...unusedImports],
-            duplicate,
-            longParams,
-            barrel: barrelFiles,
+            dead: [...fallowResults.flatMap(r => r.dead), ...analysisResult.flatMap(r => r.unusedImports)],
+            duplicate: fallowResults.flatMap(r => r.duplicate),
+            longParams: longParamResults.flat(),
+            barrel: analysisResult.flatMap(r => r.barrelFiles),
         },
+        modules: analysisResult.flatMap(r => r.modules),
     };
 };
 
+const generateReport = async (folder: vscode.WorkspaceFolder, entry: string[]): Promise<CachedResult> => {
+    const key = folder.uri.toString();
+    if (!cache.has(key)) {
+        cache.set(key, await computeReport(folder, entry));
+    }
+    return cache.get(key)!;
+};
+
 export const createHealthApi = (getFolders: () => readonly vscode.WorkspaceFolder[] | undefined): HealthApi => ({
-    generateReport: () => tryAsync(async () => {
+    invalidateCache: () => cache.clear(),
+    generateReport: (gitDiffOnly: boolean) => tryAsync(async () => {
         const entry: string[] = vscode.workspace.getConfiguration().get<{ entry?: string[] }>('codehealth')?.entry ?? [];
-        const reports = await Promise.all((getFolders() ?? []).map(folder => generateReport(folder, entry)));
-        return reports.reduce<Report>(
-            (acc, { bundle, smells }) => ({
-                bundle: (acc.bundle + bundle),
-                smells: {
-                    dead: [...(acc.smells.dead ?? []), ...(smells.dead ?? [])],
-                    duplicate: [...(acc.smells.duplicate ?? []), ...(smells.duplicate ?? [])],
-                    longParams: [...(acc.smells.longParams ?? []), ...(smells.longParams ?? [])],
-                    barrel: [...(acc.smells.barrel ?? []), ...(smells.barrel ?? [])],
-                },
-            }),
-            { bundle: 0, smells: {} }
-        );
+        const diffPaths = gitDiffOnly
+            ? new Set((await getGitDiffPaths()).map(p => vscode.workspace.asRelativePath(p)))
+            : undefined;
+        const results = await Promise.all((getFolders() ?? []).map(folder => generateReport(folder, entry)));
+
+        const smells: Report["smells"] = {
+            dead: results.flatMap(r => r.smells.dead ?? []),
+            duplicate: results.flatMap(r => r.smells.duplicate ?? []),
+            longParams: results.flatMap(r => r.smells.longParams ?? []),
+            barrel: results.flatMap(r => r.smells.barrel ?? []),
+        };
+        const modules = results.flatMap(r => r.modules);
+
+        if (diffPaths) {
+            const filteredModules = modules.filter(m => diffPaths.has(m.file));
+            return {
+                bundle: sumUncompressed(filteredModules),
+                smells: Object.fromEntries(
+                    Object.entries(smells).map(([key, items]) => [key, items.filter(s => diffPaths.has(s.file))])
+                ),
+            };
+        }
+
+        return { bundle: sumUncompressed(modules), smells };
     }),
 });

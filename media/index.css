@@ -167,6 +167,81 @@ summary > span:last-child {
 	color: var(--vscode-charts-red);
 }
 
+.row__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--dimensions-200);
+}
+
+.toggle {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+.toggle input {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.toggle__track {
+	position: relative;
+	width: 48px;
+	height: 22px;
+	border-radius: 11px;
+	background: var(--vscode-input-background);
+	border: 1px solid var(--vscode-panel-border, #444);
+	transition: background 0.2s;
+	font-size: 0.65em;
+	font-weight: 600;
+}
+
+/* Thumb */
+.toggle__track::after {
+	content: '';
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--vscode-foreground);
+	transition: transform 0.2s;
+}
+
+/* Label — unchecked shows "All" on the right */
+.toggle__track::before {
+	content: 'All';
+	position: absolute;
+	right: 5px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: var(--vscode-foreground);
+	opacity: 0.7;
+	pointer-events: none;
+}
+
+/* Checked state */
+input:checked + .toggle__track {
+	background: var(--vscode-button-background);
+}
+
+input:checked + .toggle__track::after {
+	transform: translateX(26px);
+}
+
+/* Label — checked shows "Diff" on the left */
+input:checked + .toggle__track::before {
+	content: 'Diff';
+	right: unset;
+	left: 5px;
+	color: var(--vscode-button-foreground);
+	opacity: 1;
+}
+
 button {
 	background-color: var(--vscode-button-background);
 	color: var(--vscode-button-foreground);

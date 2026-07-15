@@ -1,4 +1,5 @@
 import type { Loadable, ModuleNode, SmellMap } from '../../types';
+import { useGetAppContext } from '../hooks/useAppContext';
 
 interface Props {
     bundle: Loadable<ModuleNode["uncompressed"]>;
@@ -18,6 +19,8 @@ function healthBarColor(healthPct: number): string {
 }
 
 export const SummaryCard = ({ bundle, smells }: Props) => {
+    const { gitDiffOnly } = useGetAppContext();
+
     if (bundle.state === 'loading' || smells.state === 'loading') {
         return (
             <>
@@ -38,9 +41,10 @@ export const SummaryCard = ({ bundle, smells }: Props) => {
     const healthPct = 100 - smellPct;
     const healthyBytes = totalBytes - smellBytes;
 
+    const scope = gitDiffOnly ? 'diff' : 'internal code';
     const message = smellPct === 0
-        ? 'Your internal code looks healthy!'
-        : `${smellPct}% of your internal code smells unwell.`;
+        ? `Your ${scope} looks healthy!`
+        : `${smellPct}% of your ${scope} smells unwell.`;
 
     return (
         <>
