@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.4.0](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.3.3...CodeHealthJS-v0.4.0) (2026-07-15)
+
+
+### Features
+
+* add git diff toggle to scope health report to changed files ([82fae6c](https://github.com/KaitlynParsons/code-health/commit/82fae6c67fab0faeec6ade6633142a8ad2e1012b))
+
 ## [0.3.3](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.3.2...CodeHealthJS-v0.3.3) (2026-07-13)
 
 
