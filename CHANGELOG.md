@@ -2,6 +2,13 @@
 
 All notable changes to the "codehealth.js" extension will be documented in this file.
 
+## [0.4.1](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.4.0...CodeHealthJS-v0.4.1) (2026-07-16)
+
+
+### Bug Fixes
+
+* invalidate cache on manual refresh ([b1533ea](https://github.com/KaitlynParsons/code-health/commit/b1533ea7248f9379a198b72cc53973efa4c98862))
+
 ## [0.4.0](https://github.com/KaitlynParsons/code-health/compare/CodeHealthJS-v0.3.3...CodeHealthJS-v0.4.0) (2026-07-15)
 
 
