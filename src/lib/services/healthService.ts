@@ -57,10 +57,13 @@ const computeReport = async (folder: vscode.WorkspaceFolder, entry: string[]): P
 
 const generateReport = async (folder: vscode.WorkspaceFolder, entry: string[]): Promise<CachedResult> => {
     const key = folder.uri.toString();
-    if (!cache.has(key)) {
-        cache.set(key, await computeReport(folder, entry));
+    const existingReport = cache.get(key);
+    if (!existingReport) {
+        const newReport = await computeReport(folder, entry);
+        cache.set(key, newReport);
+        return newReport;
     }
-    return cache.get(key)!;
+    return existingReport;
 };
 
 export const createHealthApi = (getFolders: () => readonly vscode.WorkspaceFolder[] | undefined): HealthApi => ({

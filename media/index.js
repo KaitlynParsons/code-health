@@ -21877,7 +21877,7 @@
           /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Toggle, {}),
           /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => {
             if (report.state === "loading") return;
-            postMessage({ type: "ready", gitDiffOnly });
+            postMessage({ type: "refresh", gitDiffOnly });
           }, "aria-label": "Refresh", children: "Refresh" })
         ] })
       ] }),

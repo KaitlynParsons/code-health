@@ -3,11 +3,13 @@ import { HealthApi } from './healthService';
 
 export type AppMessage =
 	| { type: 'openFile'; workspaceUri: string; file: string; line: number }
-	| { type: 'ready'; gitDiffOnly: boolean };
+	| { type: 'ready'; gitDiffOnly: boolean }
+	| { type: 'refresh'; gitDiffOnly: boolean };
 
 interface MessageApi {
 	readonly openFile: (message: { workspaceUri: string, file: string, line: number }) => Promise<void>;
 	readonly ready: (gitDiffOnly: boolean) => Promise<void>;
+	readonly refresh: (gitDiffOnly: boolean) => Promise<void>;
 }
 
 export const createMessageApi = (webview: vscode.Webview, healthApi: HealthApi): MessageApi => {
@@ -27,6 +29,10 @@ export const createMessageApi = (webview: vscode.Webview, healthApi: HealthApi):
 		},
 
 		ready: postResults,
+		refresh: (gitDiffOnly: boolean) => {
+			healthApi.invalidateCache();
+			return postResults(gitDiffOnly);
+		},
 	};
 };
 
@@ -34,5 +40,6 @@ export const handleMessage = (message: AppMessage, api: MessageApi): Promise<voi
 	switch (message.type) {
 		case 'openFile': return api.openFile(message);
 		case 'ready': return api.ready(message.gitDiffOnly);
+		case 'refresh': return api.refresh(message.gitDiffOnly);
 	}
 };

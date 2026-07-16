@@ -16,7 +16,7 @@ const AppContainer = ({ children }: { children: ReactNode }) => {
 				<Toggle />
 				<button onClick={() => {
 					if (report.state === "loading") return;
-					postMessage({ type: 'ready', gitDiffOnly })
+					postMessage({ type: 'refresh', gitDiffOnly })
 				}} aria-label="Refresh">
 					Refresh
 				</button>
